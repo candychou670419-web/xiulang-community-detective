@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社區小偵探：尋找秀朗神祕守護者｜實境解謎互動遊戲</title>
+  <!-- Canvas Confetti Library for victory effects -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- HTML2Canvas for downloading certificate -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --accent-color: #f59e0b;
+      --bg-color: #eff6ff;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --success-green: #10b981;
+      --danger-red: #ef4444;
+      --font-family: 'PingFang TC', 'Microsoft JhengHei', 'Helvetica Neue', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+    }
+
+    /* Container */
+    #app-container {
+      width: 100%;
+      max-width: 768px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      min-height: 640px;
+    }
+
+    /* Header Bar */
+    header {
+      background: linear-gradient(90deg, #2563eb, #3b82f6);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title span.badge {
+      background: var(--accent-color);
+      color: #000;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    /* Gem inventory */
+    .gems-tracker {
+      display: flex;
+      gap: 6px;
+      background: rgba(255,255,255,0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .gem-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: #aaa;
+      transition: all 0.4s ease;
+      border: 2px solid transparent;
+    }
+
+    .gem-icon.unlocked {
+      background: #fbbf24;
+      color: #78350f;
+      border-color: #ffffff;
+      box-shadow: 0 0 10px #fbbf24;
+      transform: scale(1.1);
+    }
+
+    /* Speech synthesis audio btn */
+    .audio-btn {
+      background: #fef08a;
+      color: #854d0e;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
+    }
+    .audio-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Content Screens */
+    .screen {
+      display: none;
+      padding: 24px 20px;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Story / Welcome */
+    .story-card {
+      background: #f0fdf4;
+      border: 2px dashed #4ade80;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .character-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .owl-avatar {
+      width: 70px;
+      height: 70px;
+      background: #fef3c7;
+      border: 3px solid #f59e0b;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .story-text {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #334155;
+    }
+
+    /* Map View */
+    .map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .station-card {
+      background: #ffffff;
+      border: 3px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .station-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .station-card.completed {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+
+    .station-badge-icon {
+      font-size: 3rem;
+      margin-bottom: 8px;
+    }
+
+    .station-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
+
+    .station-subtitle {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .completed-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #10b981;
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(37,99,235,0.3);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 6px 16px rgba(16,185,129,0.3);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+      box-shadow: none;
+    }
+
+    /* Puzzle 1: Book Password */
+    .book-callnum {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      padding: 12px;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 2px;
+      color: #b45309;
+      margin: 12px 0;
+    }
+
+    .word-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .word-chip {
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .word-chip.selected {
+      background: #3b82f6;
+      color: white;
+      border-color: #1d4ed8;
+      transform: scale(1.05);
+    }
+
+    .answer-box {
+      min-height: 50px;
+      background: #fafafa;
+      border: 2px dashed #94a3b8;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 16px;
+      padding: 8px;
+    }
+
+    /* Puzzle 2: Police Eyes */
+    .quiz-option {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .quiz-option:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    .quiz-option.active {
+      border-color: #3b82f6;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* Puzzle 3: Ecology Bingo */
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .bingo-card {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.3s;
+    }
+
+    .bingo-card.checked {
+      background: #dcfce7;
+      border-color: #22c55e;
+      transform: scale(0.98);
+      position: relative;
+    }
+
+    .bingo-card.checked::after {
+      content: '✓';
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      background: #22c55e;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .bingo-icon {
+      font-size: 2.2rem;
+      margin-bottom: 4px;
+    }
+
+    .bingo-label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #334155;
+    }
+
+    /* Puzzle 4: Market Money */
+    .money-container {
+      background: #fffbebfb;
+      border: 2px solid #fcd34d;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    .coin-display {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .coin {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .coin:active {
+      transform: scale(0.9);
+    }
+
+    .coin-10 {
+      background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+      border: 3px solid #64748b;
+      color: #1e293b;
+    }
+
+    .coin-5 {
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      border: 3px solid #d97706;
+      color: #78350f;
+    }
+
+    .coin-1 {
+      background: linear-gradient(135deg, #fdba74, #ea580c);
+      border: 3px solid #c2410c;
+      color: #ffffff;
+    }
+
+    /* Certificate Screen */
+    .certificate-card {
+      background: #ffffff;
+      border: 8px double #d97706;
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      background-image: radial-gradient(#fef3c7 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+
+    .cert-header {
+      font-size: 1.6rem;
+      color: #92400e;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .cert-seal {
+      width: 80px;
+      height: 80px;
+      background: #dc2626;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px auto;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 4px solid #fef2f2;
+      box-shadow: 0 4px 12px rgba(220,38,38,0.4);
+      writing-mode: vertical-rl;
+      letter-spacing: 2px;
+    }
+
+    .input-group {
+      margin: 16px 0;
+    }
+
+    .input-field {
+      width: 80%;
+      padding: 12px;
+      font-size: 1.2rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <!-- Header -->
+  <header>
+    <div class="brand-title">
+      🕵️‍♂️ 社區小偵探 <span class="badge">二年級版</span>
+    </div>
+    <!-- Gem Inventory -->
+    <div class="gems-tracker">
+      <div class="gem-icon" id="gem-1" title="民權圖書館：知">知</div>
+      <div class="gem-icon" id="gem-2" title="得和派出所：正">正</div>
+      <div class="gem-icon" id="gem-3" title="瓦窯溝：愛">愛</div>
+      <div class="gem-icon" id="gem-4" title="民治市場：合">合</div>
+    </div>
+  </header>
+
+  <!-- SCREEN 0: STORY / WELCOME -->
+  <div id="screen-story" class="screen active">
+    <div class="story-card">
+      <div class="character-box">
+        <div class="owl-avatar">🦉</div>
+        <div>
+          <h2 style="color: #92400e;">秀朗守護者求救信！</h2>
+          <p style="font-size: 0.9rem; color: #65a30d; font-weight: bold;">秀朗國小專屬實境解謎遊戲</p>
+        </div>
+      </div>
+      <button class="audio-btn" onclick="speakText(document.getElementById('story-content').innerText)">
+        🔊 聽貓頭鷹隊長說話
+      </button>
+      <div class="story-text" id="story-content">
+        親愛的小偵探：<br>
+        我是社區守護者小貓頭鷹！秀朗社區的「神奇守護寶石」被藏在四個重要的秘密地點。<br>
+        請你們帶著平板，前往<b>【民權圖書館】</b>、<b>【得和派出所】</b>、<b>【瓦窯溝】</b>與<b>【民治市場】</b>，解開四道謎題，收集<b>【知、正、愛、合】</b>四顆寶石，召喚守護者吧！
+      </div>
+    </div>
+
+    <div style="margin-top: auto;">
+      <button class="btn btn-success" onclick="navigateTo('map')">
+        🚀 出發！開啟社區探索地圖
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN MAP: MAIN MAP -->
+  <div id="screen-map" class="screen">
+    <button class="audio-btn" onclick="speakText('請選擇你要探索的社區站點，或是用平板掃描現場的 QR Code！')">
+      🔊 點擊播放語音提示
+    </button>
+    <h2 style="margin-bottom: 6px;">🗺️ 社區實境解謎地圖</h2>
+    <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 12px;">點選站點解謎，或掃描現場實體 QR Code！</p>
+
+    <div class="map-grid">
+      <!-- Station 1 -->
+      <div class="station-card" id="card-st1" onclick="navigateTo('station1')">
+        <div class="station-badge-icon">📚</div>
+        <div class="station-title">第一站：民權圖書館</div>
+        <div class="station-subtitle">【文字解密】圖書密碼鎖</div>
+        <div class="completed-tag" id="tag-st1" style="display:none;">已通關 ✓</div>
+      </div>
+
+      <!-- Station 2 -->
+      <div class="station-card" id="card-st2" onclick="navigateTo('station2')">
+        <div class="station-badge-icon">👮‍♂️</div>
+        <div class="station-title">第二站：得和派出所</div>
+        <div class="station-subtitle">【觀察辨識】眼力大考驗</div>
+        <div class="completed-tag" id="tag-st2" style="display:none;">已通關 ✓</div>
+      </div>
+
+      <!-- Station 3 -->
+      <div class="station-card" id="card-st3" onclick="navigateTo('station3')">
+        <div class="station-badge-icon">🌿</div>
+        <div class="station-title">第三站：瓦窯溝</div>
+        <div class="station-subtitle">【生態探索】河畔 Bingo</div>
+        <div class="completed-tag" id="tag-st3" style="display:none;">已通關 ✓</div>
+      </div>
+
+      <!-- Station 4 -->
+      <div class="station-card" id="card-st4" onclick="navigateTo('station4')">
+        <div class="station-badge-icon">🍎</div>
+        <div class="station-title">第四站：民治市場</div>
+        <div class="station-subtitle">【金錢運用】30元探險家</div>
+        <div class="completed-tag" id="tag-st4" style="display:none;">已通關 ✓</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <button class="btn btn-success" id="btn-final-cert" onclick="navigateTo('certificate')" style="display: none;">
+        🏆 集齊 4 顆寶石！領取榮譽證書
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 1: MINQUAN LIBRARY -->
+  <div id="screen-station1" class="screen">
+    <button class="audio-btn" onclick="speakText(document.getElementById('st1-prompt').innerText)">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>📚 第一站：民權圖書館（圖書密碼鎖）</h2>
+
+    <div class="story-card" id="st1-prompt">
+      <b>任務提示：</b><br>
+      請在圖書館中尋找「神祕索書號」卡片所標示的書籍！打開書本指定頁碼，找到知識密碼。
+    </div>
+
+    <div class="book-callnum">
+      索書號：J 520 1234
+    </div>
+
+    <p style="font-weight: bold; margin-bottom: 8px;">請點擊下列字詞，組合出書中的關鍵密碼：</p>
+    
+    <div class="answer-box" id="st1-answer-box">
+      <span style="color:#cbd5e1;">(點選下方字詞填入)</span>
+    </div>
+
+    <div class="word-chips-container" id="st1-chips">
+      <div class="word-chip" onclick="toggleSt1Chip(this, '知')">知</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '識')">識</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '就')">就</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '是')">是</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '力')">力</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '量')">量</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '快')">快</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '樂')">樂</div>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation1()">提交驗證</button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 2: POLICE STATION -->
+  <div id="screen-station2" class="screen">
+    <button class="audio-btn" onclick="speakText(document.getElementById('st2-prompt').innerText)">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>👮‍♂️ 第二站：得和派出所（波麗士眼力大考驗）</h2>
+
+    <div class="story-card" id="st2-prompt">
+      <b>觀察任務：</b><br>
+      觀察得和派出所門口警徽與告示牌，回答下列波麗士小問題！
+    </div>
+
+    <p style="font-weight: bold; margin-bottom: 8px;">問題一：警察伯伯警徽上有幾顆金黃色星芒？</p>
+    <div id="q1-options">
+      <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">A. 3 顆星</div>
+      <div class="quiz-option" onclick="selectQuiz('q1', 5, this)">B. 5 顆星</div>
+      <div class="quiz-option" onclick="selectQuiz('q1', 8, this)">C. 8 顆星</div>
+    </div>
+
+    <p style="font-weight: bold; margin: 12px 0 8px 0;">問題二：遇緊急狀況想向派出所求助，應該撥打電話號碼？</p>
+    <div id="q2-options">
+      <div class="quiz-option" onclick="selectQuiz('q2', 110, this)">A. 110 (報案專線)</div>
+      <div class="quiz-option" onclick="selectQuiz('q2', 119, this)">B. 119 (火災救護)</div>
+      <div class="quiz-option" onclick="selectQuiz('q2', 113, this)">C. 113 (家暴保護)</div>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation2()">提交驗證</button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 3: ECO BINGO -->
+  <div id="screen-station3" class="screen">
+    <button class="audio-btn" onclick="speakText('請沿著瓦窯溝步道觀察，發現現場有的自然景觀就點擊點亮卡牌，連成兩條線即可解鎖！')">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>🌿 第三站：瓦窯溝（河畔生態 Bingo 卡）</h2>
+    <p style="color: #64748b; font-size: 0.9rem;">沿步道實地觀察，點亮看到的生態夥伴，連成 <b>2 條線</b> 即可通關！</p>
+
+    <div class="bingo-grid" id="bingo-board">
+      <!-- 3x3 Grid generated via JS -->
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation3()">驗證 Bingo 連線</button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 4: MARKET MONEY -->
+  <div id="screen-station4" class="screen">
+    <button class="audio-btn" onclick="speakText('小偵探拿 30 元買了 15 元紅豆餅與 10 元冬瓜茶，請算算看老闆要找回多少錢？')">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>🍎 第四站：民治市場（30元美食探險家）</h2>
+
+    <div class="story-card">
+      <b>購物任務算數挑戰：</b><br>
+      你拿著 <b>30 元</b>（3張10元），買了一份 <b>15 元</b> 古早味紅豆餅與一杯 <b>10 元</b> 冬瓜茶。<br>
+      1. 一共花了多少錢？ (15 + 10 = ?)<br>
+      2. 老闆應該找回你多少錢？ (30 - 花費 = ?)
+    </div>
+
+    <div class="money-container">
+      <p style="font-weight: bold; margin-bottom: 8px;">請點擊硬幣放入錢包，拿回正確找零金額 (目標找回：<span id="target-change" style="color: #d97706; font-size: 1.2rem;">5</span> 元)：</p>
+      
+      <div class="coin-display">
+        <div class="coin coin-10" onclick="addCoin(10)">$10</div>
+        <div class="coin coin-5" onclick="addCoin(5)">$5</div>
+        <div class="coin coin-1" onclick="addCoin(1)">$1</div>
+      </div>
+
+      <div style="font-size: 1.2rem; font-weight: bold; color: #1e293b; margin-top: 10px;">
+        目前拿到的找零：<span id="current-change-val" style="color: #2563eb; font-size: 1.5rem;">0</span> 元
+      </div>
+      <button style="background: none; border: none; color: #dc2626; text-decoration: underline; cursor: pointer; margin-top: 6px;" onclick="resetCoins()">重新點算硬幣</button>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation4()">提交購物找零結果</button>
+    </div>
+  </div>
+
+  <!-- SCREEN CERTIFICATE -->
+  <div id="screen-certificate" class="screen">
+    <h2>🏆 闖關成功！喚醒秀朗守護者</h2>
+
+    <div class="certificate-card" id="cert-print-area">
+      <div style="font-size: 3rem; margin-bottom: 4px;">🦉✨</div>
+      <div class="cert-header">秀朗社區小偵探 榮譽證書</div>
+      
+      <p style="font-size: 1rem; color: #475569; margin-bottom: 12px;">
+        恭喜完成【民權圖書館、得和派出所、瓦窯溝、民治市場】實境解謎任務！
+      </p>
+
+      <div class="input-group">
+        <label style="display:block; font-weight:bold; margin-bottom:4px;">小偵探組別 / 姓名：</label>
+        <input type="text" id="student-name-input" class="input-field" placeholder="例如：二年一班 第一組" value="秀朗小偵探">
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 12px; margin: 16px 0;">
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【知】智慧寶石</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【正】正義寶石</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【愛】生態寶石</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【合】合作寶石</span>
+      </div>
+
+      <div class="cert-seal">秀朗認證</div>
+
+      <p style="font-size: 0.85rem; color: #94a3b8;" id="cert-date-str"></p>
+    </div>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+      <button class="btn btn-success" onclick="downloadCertificate()">
+        📸 儲存 / 下載數位證書
+      </button>
+      <button class="btn btn-secondary" onclick="navigateTo('map')">
+        返回社區地圖
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Game State
+  const state = {
+    unlockedGems: { st1: false, st2: false, st3: false, st4: false },
+    st1SelectedWords: [],
+    st2Answers: { q1: null, q2: null },
+    st3BingoState: Array(9).fill(false),
+    st4CurrentCoins: 0
+  };
+
+  // Bingo Items Data
+  const bingoItems = [
+    { icon: '🕊️', name: '小白鷺' },
+    { icon: '🦢', name: '大公鵝' },
+    { icon: '🌳', name: '台灣欒樹' },
+    { icon: '💧', name: '水質淨化設施' },
+    { icon: '🐟', name: '大肚魚' },
+    { icon: '🦆', name: '紅冠水雞' },
+    { icon: '🌿', name: '柳樹' },
+    { icon: '🦋', name: '蝴蝶' },
+    { icon: '🌱', name: '淨水植物' }
+  ];
+
+  // Load saved state
+  function loadSavedState() {
+    const saved = localStorage.getItem('xiulang_escape_game');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        state.unlockedGems = parsed.unlockedGems || state.unlockedGems;
+      } catch(e){}
+    }
+    updateGemUI();
+  }
+
+  function saveState() {
+    localStorage.setItem('xiulang_escape_game', JSON.stringify({ unlockedGems: state.unlockedGems }));
+    updateGemUI();
+  }
+
+  function updateGemUI() {
+    ['st1', 'st2', 'st3', 'st4'].forEach((st, idx) => {
+      const gemEl = document.getElementById(`gem-${idx+1}`);
+      const tagEl = document.getElementById(`tag-${st}`);
+      const cardEl = document.getElementById(`card-${st}`);
+
+      if (state.unlockedGems[st]) {
+        gemEl.classList.add('unlocked');
+        if (tagEl) tagEl.style.display = 'block';
+        if (cardEl) cardEl.classList.add('completed');
+      }
+    });
+
+    // Check if all unlocked
+    const allDone = Object.values(state.unlockedGems).every(v => v === true);
+    const finalBtn = document.getElementById('btn-final-cert');
+    if (finalBtn) {
+      finalBtn.style.display = allDone ? 'block' : 'none';
+    }
+  }
+
+  // Audio synthesizer (Web Audio API)
+  function playSound(type) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+        osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3); // C6
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.6);
+      } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, ctx.currentTime);
+        osc.frequency.setValueAtTime(180, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch(e) {}
+  }
+
+  // Text-To-Speech (Web Speech API)
+  function speakText(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-TW';
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('您的設備暫不支援語音朗讀功能');
+    }
+  }
+
+  // Navigation
+  function navigateTo(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(`screen-${screenId}`);
+    if (target) {
+      target.classList.add('active');
+      window.location.hash = screenId;
+    }
+    if (screenId === 'certificate') {
+      const now = new Date();
+      document.getElementById('cert-date-str').innerText = `核發日期：${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日`;
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+  }
+
+  // Hash router
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) navigateTo(hash);
+  });
+
+  // STATION 1 LOGIC
+  function toggleSt1Chip(el, word) {
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      state.st1SelectedWords = state.st1SelectedWords.filter(w => w !== word);
+    } else {
+      el.classList.add('selected');
+      state.st1SelectedWords.push(word);
+    }
+    const box = document.getElementById('st1-answer-box');
+    box.innerText = state.st1SelectedWords.length > 0 ? state.st1SelectedWords.join('') : '(點選下方字詞填入)';
+  }
+
+  function verifyStation1() {
+    const ans = state.st1SelectedWords.join('');
+    if (ans === '知識就是力量') {
+      playSound('success');
+      confetti({ particleCount: 50, spread: 60 });
+      alert('🎉 太棒了！解開圖書密碼鎖，獲得【知】字智慧寶石！');
+      state.unlockedGems.st1 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert('❌ 密碼不太對喔！請參考索書號與書中文字重新試試看！（提示：知識就是...）');
+    }
+  }
+
+  // STATION 2 LOGIC
+  function selectQuiz(qId, val, el) {
+    state.st2Answers[qId] = val;
+    const parent = document.getElementById(`${qId}-options`);
+    parent.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function verifyStation2() {
+    if (state.st2Answers.q1 === 5 && state.st2Answers.q2 === 110) {
+      playSound('success');
+      confetti({ particleCount: 50, spread: 60 });
+      alert('🎉 恭喜通過波麗士眼力大考驗，獲得【正】字正義寶石！');
+      state.unlockedGems.st2 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert('❌ 有答案選錯了喔！警徽有 5 顆星，報案要打 110，再檢查看看吧！');
+    }
+  }
+
+  // STATION 3 BINGO LOGIC
+  function initBingoBoard() {
+    const board = document.getElementById('bingo-board');
+    board.innerHTML = '';
+    bingoItems.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'bingo-card';
+      card.innerHTML = `<div class="bingo-icon">${item.icon}</div><div class="bingo-label">${item.name}</div>`;
+      card.onclick = () => {
+        state.st3BingoState[idx] = !state.st3BingoState[idx];
+        card.classList.toggle('checked', state.st3BingoState[idx]);
+        playSound('success');
+      };
+      board.appendChild(card);
+    });
+  }
+
+  function checkBingoLines() {
+    const g = state.st3BingoState;
+    const lines = [
+      [0,1,2], [3,4,5], [6,7,8], // Rows
+      [0,3,6], [1,4,7], [2,5,8], // Cols
+      [0,4,8], [2,4,6]          // Diagonals
+    ];
+    let count = 0;
+    lines.forEach(l => {
+      if (g[l[0]] && g[l[1]] && g[l[2]]) count++;
+    });
+    return count;
+  }
+
+  function verifyStation3() {
+    const lines = checkBingoLines();
+    if (lines >= 2) {
+      playSound('success');
+      confetti({ particleCount: 70, spread: 70 });
+      alert(`🎉 太厲害了！你完成了 ${lines} 條連線 BINGO！獲得【愛】字生態寶石！`);
+      state.unlockedGems.st3 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert(`目前完成了 ${lines} 條連線，還差一點點！需要達成 2 條連線才能通關喔！`);
+    }
+  }
+
+  // STATION 4 LOGIC
+  function addCoin(val) {
+    state.st4CurrentCoins += val;
+    document.getElementById('current-change-val').innerText = state.st4CurrentCoins;
+    playSound('success');
+  }
+
+  function resetCoins() {
+    state.st4CurrentCoins = 0;
+    document.getElementById('current-change-val').innerText = '0';
+  }
+
+  function verifyStation4() {
+    if (state.st4CurrentCoins === 5) {
+      playSound('success');
+      confetti({ particleCount: 50, spread: 60 });
+      alert('🎉 太厲害了！算數完全正確，成功拿回 5 元找零，獲得【合】字合作寶石！');
+      state.unlockedGems.st4 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert(`❌ 找零金額不太對喔！(花了 15 + 10 = 25元，拿 30 元給老闆，應該找回 5 元)。目前點算：${state.st4CurrentCoins} 元。`);
+    }
+  }
+
+  // CERTIFICATE DOWNLOAD
+  function downloadCertificate() {
+    const area = document.getElementById('cert-print-area');
+    html2canvas(area).then(canvas => {
+      const link = document.createElement('a');
+      link.download = '秀朗社區小偵探_榮譽證書.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  }
+
+  // Initialize
+  window.onload = () => {
+    initBingoBoard();
+    loadSavedState();
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      navigateTo(hash);
+    }
+  };
+</script>
+</body>
+</html>

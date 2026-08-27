@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>【實體張貼】社區小偵探實境解謎 站點 QR Code 任務海報卡</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+    body {
+      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      color: #1e293b;
+    }
+    .controls {
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+      background: #ffffff;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .controls label {
+      font-weight: bold;
+    }
+    .controls input {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      width: 100%;
+    }
+    .controls button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      width: fit-content;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 4px solid #3b82f6;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      position: relative;
+      page-break-inside: avoid;
+    }
+
+    .card-header {
+      background: #eff6ff;
+      border-radius: 12px;
+      padding: 8px 16px;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 0.95rem;
+      color: #0369a1;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .qr-box {
+      background: #ffffff;
+      border: 3px dashed #93c5fd;
+      border-radius: 16px;
+      padding: 12px;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .qr-img {
+      width: 180px;
+      height: 180px;
+    }
+
+    .instruction {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #334155;
+      margin: 8px 0;
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      padding: 8px 12px;
+      border-radius: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .safety-notice {
+      font-size: 0.85rem;
+      color: #dc2626;
+      font-weight: bold;
+      margin-top: auto;
+      padding-top: 8px;
+    }
+
+    @media print {
+      .controls { display: none; }
+      body { background: white; padding: 0; }
+      .grid { gap: 15px; }
+      .card { border-color: #000; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <h3>⚙️ 站點 QR Code 網址設定 (老師預覽/列印專用)</h3>
+    <div>
+      <label>解謎網頁線上 URL (若是本機開啟，可維持預設相對路徑)：</label>
+      <input type="text" id="baseUrlInput" value="https://candychou670419-web.github.io/xiulang-escape-room/index.html" placeholder="例如：https://candychou670419-web.github.io/xiulang-escape-room/index.html">
+    </div>
+    <button onclick="updateQRCodes()">🔄 更新 QR Code 圖樣</button>
+    <button onclick="window.print()" style="background: #10b981;">🖨️ 一鍵列印 4 站海報卡</button>
+  </div>
+
+  <div class="grid">
+    <!-- Card 1 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📚 第一站：民權圖書館</div>
+        <div class="card-subtitle">【文字解密】圖書密碼鎖</div>
+      </div>
+      <div class="qr-box">
+        <img id="qr-1" class="qr-img" src="" alt="QR Code">
+        <span style="font-size:0.8rem; color:#64748b; margin-top:4px;">請用平板相機掃描上方 QR Code</span>
+      </div>
+      <div class="instruction">
+        <b>🕵️‍♂️ 小偵探任務：</b><br>
+        找到索書號 <code>J 520 1234</code> 的書籍，翻開第 12 頁，把密碼文字填入平板中！
+      </div>
+      <div class="safety-notice">⚠️ 安全與常規提示：保持安靜、輕聲細語、不奔跑。</div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👮‍♂️ 第二站：得和派出所</div>
+        <div class="card-subtitle">【觀察辨識】波麗士眼力大考驗</div>
+      </div>
+      <div class="qr-box">
+        <img id="qr-2" class="qr-img" src="" alt="QR Code">
+        <span style="font-size:0.8rem; color:#64748b; margin-top:4px;">請用平板相機掃描上方 QR Code</span>
+      </div>
+      <div class="instruction">
+        <b>🕵️‍♂️ 小偵探任務：</b><br>
+        觀察派出所門口警徽有幾顆星芒，以及緊急求助專線號碼！
+      </div>
+      <div class="safety-notice">⚠️ 安全與常規提示：遵從引導、不打擾員警正常勤務。</div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🌿 第三站：瓦窯溝</div>
+        <div class="card-subtitle">【生態探索】河畔生態 Bingo</div>
+      </div>
+      <div class="qr-box">
+        <img id="qr-3" class="qr-img" src="" alt="QR Code">
+        <span style="font-size:0.8rem; color:#64748b; margin-top:4px;">請用平板相機掃描上方 QR Code</span>
+      </div>
+      <div class="instruction">
+        <b>🕵️‍♂️ 小偵探任務：</b><br>
+        沿著步道觀察小白鷺、大公鵝與生態設施，完成 2 條線 BINGO 連線！
+      </div>
+      <div class="safety-notice">⚠️ 安全與常規提示：嚴禁靠近水邊護欄，全程集體行動。</div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🍎 第四站：民治市場</div>
+        <div class="card-subtitle">【金錢運用】30元美食探險家</div>
+      </div>
+      <div class="qr-box">
+        <img id="qr-4" class="qr-img" src="" alt="QR Code">
+        <span style="font-size:0.8rem; color:#64748b; margin-top:4px;">請用平板相機掃描上方 QR Code</span>
+      </div>
+      <div class="instruction">
+        <b>🕵️‍♂️ 小偵探任務：</b><br>
+        用 30 元買紅豆餅 (15元) 與冬瓜茶 (10元)，算算老闆該找回多少錢！
+      </div>
+      <div class="safety-notice">⚠️ 安全與常規提示：留意市場人潮與車輛，手拿好零錢包。</div>
+    </div>
+  </div>
+
+  <script>
+    function updateQRCodes() {
+      const baseUrl = document.getElementById('baseUrlInput').value.trim();
+      const stations = ['station1', 'station2', 'station3', 'station4'];
+      
+      stations.forEach((st, idx) => {
+        const fullUrl = encodeURIComponent(`${baseUrl}#${st}`);
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${fullUrl}`;
+        document.getElementById(`qr-${idx+1}`).src = qrUrl;
+      });
+    }
+
+    window.onload = updateQRCodes;
+  </script>
+</body>
+</html>

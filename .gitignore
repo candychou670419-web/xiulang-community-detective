@@ -1,0 +1,12 @@
+*.tmp
+*.log
+.DS_Store
+node_modules/
+__pycache__/
+
+# Media & Large Files
+*.MP4
+*.mp4
+*.mp3
+*.docx
+*.pdf
