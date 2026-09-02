@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可愛數字電子鐘 - 午餐12:25提醒助手</title>
+    <!-- Google Fonts for cute rounded text & digital numbers -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-bear">
+    <!-- 全螢幕煙火 Canvas 畫布 -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <div class="app-container">
+        <!-- 頂部工具列 -->
+        <header class="top-bar">
+            <div class="brand">
+                <span class="brand-icon">⏰</span>
+                <span class="brand-title">小太陽班級定時電子鐘</span>
+            </div>
+            
+            <div class="header-actions">
+                <div class="theme-selector" title="切換可愛主題">
+                    <button class="theme-btn active" data-theme="theme-bear" title="熊熊城堡">🐻 熊熊</button>
+                    <button class="theme-btn" data-theme="theme-cat" title="喵喵樂園">🐱 喵喵</button>
+                    <button class="theme-btn" data-theme="theme-space" title="太空冒險">🚀 太空</button>
+                </div>
+                
+                <button id="testAlarmBtn" class="btn btn-secondary pulse-btn">
+                    <span>🧪 測試 12:25 響鈴與煙火</span>
+                </button>
+
+                <button id="settingsBtn" class="btn btn-icon" title="提醒設定">
+                    ⚙️
+                </button>
+
+                <button id="fullscreenBtn" class="btn btn-icon" title="全螢幕切換">
+                    📺
+                </button>
+            </div>
+        </header>
+
+        <!-- 主體內容區塊 -->
+        <main class="main-content">
+            <!-- 可愛吉祥物動畫區 -->
+            <div class="mascot-wrapper">
+                <div class="mascot" id="mascotAvatar">
+                    <div class="mascot-ear left"></div>
+                    <div class="mascot-ear right"></div>
+                    <div class="mascot-face">
+                        <div class="mascot-eye left"><div class="pupil"></div></div>
+                        <div class="mascot-eye right"><div class="pupil"></div></div>
+                        <div class="mascot-cheeks left"></div>
+                        <div class="mascot-cheeks right"></div>
+                        <div class="mascot-nose"></div>
+                        <div class="mascot-mouth"></div>
+                    </div>
+                    <div class="mascot-hand left-hand">👋</div>
+                    <div class="mascot-hand right-hand">🍱</div>
+                </div>
+                <div class="speech-bubble" id="speechBubble">
+                    小朋友們，用餐要專心，多吃蔬菜身體棒棒喔！✨
+                </div>
+            </div>
+
+            <!-- 超大數字電子時鐘卡片 -->
+            <section class="clock-card">
+                <div class="date-display">
+                    <span id="dateText">2026年9月2日</span>
+                    <span class="badge-day" id="dayOfWeekText">星期三</span>
+                </div>
+
+                <div class="digital-clock">
+                    <div class="time-box">
+                        <span id="hoursText">12</span>
+                        <span class="label">時</span>
+                    </div>
+                    <span class="colon">:</span>
+                    <div class="time-box">
+                        <span id="minutesText">20</span>
+                        <span class="label">分</span>
+                    </div>
+                    <span class="colon">:</span>
+                    <div class="time-box seconds">
+                        <span id="secondsText">00</span>
+                        <span class="label">秒</span>
+                    </div>
+                    <div class="ampm-box" id="ampmText">下午</div>
+                </div>
+
+                <!-- 12:25 午餐結束倒數計時列 -->
+                <div class="lunch-countdown-bar" id="countdownBar">
+                    <div class="countdown-icon">🍱</div>
+                    <div class="countdown-info">
+                        <span class="countdown-title">距離午餐結束提醒 (<span id="alarmTimeBadge">12:25</span>) 還有：</span>
+                        <span class="countdown-timer" id="countdownTimer">00分 00秒</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 下方快捷提醒提示 -->
+            <footer class="classroom-tips">
+                <div class="tip-item">🍱 用餐細慢嚥</div>
+                <div class="tip-item">🥣 桌面保持乾淨</div>
+                <div class="tip-item">🧼 飯後肥皂洗手</div>
+                <div class="tip-item">💤 12:25 準備午休</div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- 12:25 響鈴全螢幕彈窗與動畫卡片 -->
+    <div class="modal-overlay" id="alarmModal">
+        <div class="modal-card celebration-card">
+            <div class="celebration-header">
+                <span class="sparkle-icon">✨</span>
+                <h2>🎉 午餐時間結束囉！ 🎉</h2>
+                <span class="sparkle-icon">✨</span>
+            </div>
+            
+            <p class="celebration-subtitle">小朋友們太棒了！請跟著以下四步驟準備午休喔：</p>
+
+            <div class="checklist-grid">
+                <label class="check-card" for="task1">
+                    <input type="checkbox" id="task1">
+                    <div class="check-box">✓</div>
+                    <div class="check-icon">🥣</div>
+                    <div class="check-text">
+                        <strong>第一步：蓋好便當盒</strong>
+                        <span>將碗筷收好裝進餐袋</span>
+                    </div>
+                </label>
+
+                <label class="check-card" for="task2">
+                    <input type="checkbox" id="task2">
+                    <div class="check-box">✓</div>
+                    <div class="check-icon">🧽</div>
+                    <div class="check-text">
+                        <strong>第二步：把桌面擦乾淨</strong>
+                        <span>拿抹布將桌面殘渣擦拭乾淨</span>
+                    </div>
+                </label>
+
+                <label class="check-card" for="task3">
+                    <input type="checkbox" id="task3">
+                    <div class="check-box">✓</div>
+                    <div class="check-icon">🧼</div>
+                    <div class="check-text">
+                        <strong>第三步：勤洗手保健康</strong>
+                        <span>用肥皂將雙手搓洗乾淨</span>
+                    </div>
+                </label>
+
+                <label class="check-card" for="task4">
+                    <input type="checkbox" id="task4">
+                    <div class="check-box">✓</div>
+                    <div class="check-icon">💤</div>
+                    <div class="check-text">
+                        <strong>第四步：準備安靜午休</strong>
+                        <span>回座位拿睡枕趴下休息</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button id="stopMusicBtn" class="btn btn-warning">🔕 暫停音樂</button>
+                <button id="completeAlarmBtn" class="btn btn-primary pulse-btn">🌟 我知道了！收尾完成 🌟</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定 Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card settings-card">
+            <div class="modal-header">
+                <h3>⚙️ 電子鐘與提醒設定</h3>
+                <button class="close-btn" id="closeSettingsBtn">&times;</button>
+            </div>
+            
+            <div class="settings-body">
+                <div class="form-group">
+                    <label for="alarmTimeInput">⏰ 用餐結束提醒時間 (預設 12:25)</label>
+                    <input type="time" id="alarmTimeInput" value="12:25" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="volumeRange">🎵 音樂音量大小 (<span id="volumeVal">80</span>%)</label>
+                    <input type="range" id="volumeRange" min="0" max="100" value="80" class="form-control-range">
+                </div>
+
+                <div class="form-group">
+                    <label for="musicRepeatCheck" class="checkbox-label">
+                        <input type="checkbox" id="musicRepeatCheck" checked>
+                        <span>音樂持續重複播放直到點擊「完成」</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="customMessageInput">💬 吉祥物對話框自訂文字</label>
+                    <input type="text" id="customMessageInput" value="小朋友們，用餐要專心，多吃蔬菜身體棒棒喔！✨" class="form-control">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="saveSettingsBtn" class="btn btn-primary">💾 儲存設定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

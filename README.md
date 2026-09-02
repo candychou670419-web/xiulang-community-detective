@@ -36,3 +36,8 @@
   - 完成專案初始化與 Git 版本控制建置。
   - 完成「社區小偵探：尋找秀朗神祕守護者」實境解謎互動網頁 (`escape_room_game.html`)。
   - 完成 4 站實體 QR Code 海報卡與 A4 列印排版系統 (`station_qr_cards.html`)。
+- **2026-09-02**
+  - 新增「國小低年級專屬可愛數字電子鐘 Desktop App」(`output/cute-lunch-clock/`)。
+  - 支援大字體 LCD 電子時鐘、熊熊/喵喵/太空主題切換、12:25 倒數計時。
+  - 整合 Web Audio 多聲部歡樂音樂合成器、HTML5 Canvas 全螢幕璀璨煙火與四步驟用餐收尾叮嚀。
+  - 提供 Electron 與一鍵雙擊啟動腳本 (`啟動可愛數字電子鐘.bat`)，可直接在電腦桌面使用。

@@ -1,0 +1,35 @@
+{
+  "name": "cute-lunch-clock",
+  "version": "1.0.0",
+  "description": "國小低年級可愛數字電子鐘 - 中午 12:25 音樂與煙火提醒桌面 App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "clock",
+    "alarm",
+    "elementary-school",
+    "lunch-reminder",
+    "electron"
+  ],
+  "author": "周尚枚老師 & Antigravity AI",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.0"
+  },
+  "build": {
+    "appId": "com.school.cute-lunch-clock",
+    "productName": "可愛數字電子鐘",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "icon.ico"
+    }
+  }
+}
