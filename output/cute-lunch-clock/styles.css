@@ -3,10 +3,10 @@
    ========================================================================== */
 
 :root {
-    --bg-gradient-bear: linear-gradient(135deg, #FFF7ED 0%, #FED7AA 100%);
-    --primary-bear: #F97316;
-    --primary-bear-dark: #C2410C;
-    --card-bg-bear: #FFFFFF;
+    --bg-gradient-hamster: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    --primary-hamster: #D97706;
+    --primary-hamster-dark: #B45309;
+    --card-bg-hamster: #FFFFFF;
 
     --bg-gradient-cat: linear-gradient(135deg, #FDF2F8 0%, #FBCFE8 100%);
     --primary-cat: #EC4899;
@@ -19,7 +19,7 @@
     --font-main: 'Zen Maru Gothic', 'Fredoka', 'Microsoft JhengHei', sans-serif;
     --font-clock: 'Fredoka', 'Zen Maru Gothic', monospace;
     
-    --shadow-soft: 0 12px 32px rgba(249, 115, 22, 0.15);
+    --shadow-soft: 0 12px 32px rgba(217, 119, 6, 0.15);
     --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
@@ -33,10 +33,14 @@
 
 body {
     min-height: 100vh;
-    background: var(--bg-gradient-bear);
+    background: var(--bg-gradient-hamster);
     color: #334155;
     overflow-x: hidden;
     transition: background 0.5s ease;
+}
+
+body.theme-hamster {
+    background: var(--bg-gradient-hamster);
 }
 
 body.theme-cat {
@@ -124,7 +128,7 @@ body.theme-space {
 .theme-btn.active {
     background: #FFFFFF;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    color: var(--primary-bear);
+    color: var(--primary-hamster);
 }
 
 /* 一般按鈕樣式 */
@@ -148,7 +152,7 @@ body.theme-space {
 }
 
 .btn-primary {
-    background: var(--primary-bear);
+    background: var(--primary-hamster);
     color: #FFFFFF;
 }
 .theme-cat .btn-primary { background: var(--primary-cat); }
@@ -196,7 +200,7 @@ body.theme-space {
 .mascot {
     width: 120px;
     height: 100px;
-    background: #F97316;
+    background: #F59E0B;
     border-radius: 50px 50px 45px 45px;
     position: relative;
     box-shadow: 0 10px 20px rgba(0,0,0,0.12);
@@ -333,7 +337,7 @@ body.theme-space {
 }
 
 .badge-day {
-    background: var(--primary-bear);
+    background: var(--primary-hamster);
     color: #FFFFFF;
     padding: 4px 16px;
     border-radius: 50px;
