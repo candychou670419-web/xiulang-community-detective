@@ -226,46 +226,78 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeCanvas();
 
     class Particle {
-        constructor(x, y, color) {
+        constructor(x, y, color, isSparkle = false, isRibbon = false) {
             this.x = x;
             this.y = y;
             this.color = color;
+            this.isSparkle = isSparkle;
+            this.isRibbon = isRibbon;
+
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 6 + 2;
+            const speed = isRibbon ? Math.random() * 3 + 1 : (Math.random() * 9 + 3);
+            
             this.vx = Math.cos(angle) * speed;
-            this.vy = Math.sin(angle) * speed;
+            this.vy = Math.sin(angle) * speed - (isRibbon ? 1 : 0);
             this.alpha = 1;
-            this.decay = Math.random() * 0.02 + 0.015;
-            this.gravity = 0.12;
-            this.size = Math.random() * 4 + 2;
+            this.decay = isRibbon ? (Math.random() * 0.008 + 0.005) : (Math.random() * 0.018 + 0.012);
+            this.gravity = isRibbon ? 0.06 : 0.15;
+            this.size = isRibbon ? (Math.random() * 6 + 4) : (Math.random() * 5 + 3);
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotSpeed = (Math.random() - 0.5) * 0.2;
         }
 
         update() {
-            this.vx *= 0.98;
-            this.vy *= 0.98;
+            this.vx *= 0.96;
+            this.vy *= 0.96;
             this.vy += this.gravity;
             this.x += this.vx;
             this.y += this.vy;
             this.alpha -= this.decay;
+            this.rotation += this.rotSpeed;
         }
 
         draw() {
             ctx.save();
             ctx.globalAlpha = Math.max(0, this.alpha);
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = this.color;
             ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+
+            if (this.isRibbon) {
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillRect(-this.size / 2, -this.size / 4, this.size, this.size / 2);
+            } else {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
             ctx.restore();
         }
     }
 
     function createFireworkExplosion(x, y) {
-        const colors = ['#FF5964', '#FFE74C', '#35A7FF', '#38618C', '#FF9F1C', '#E71D36', '#2EC4B6', '#F72585'];
-        const baseColor = colors[Math.floor(Math.random() * colors.length)];
+        const vibrantColors = [
+            '#FF0055', '#FFCC00', '#00FFCC', '#FF00FF', 
+            '#00E5FF', '#76FF03', '#FF6D00', '#D500F9', '#FFFFFF'
+        ];
+        const baseColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
 
-        for (let i = 0; i < 60; i++) {
+        // 主環狀爆炸 (100 顆發光粒子)
+        for (let i = 0; i < 100; i++) {
             particles.push(new Particle(x, y, baseColor));
+        }
+
+        // 副發光閃爍小星花 (40 顆)
+        const secondaryColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+        for (let i = 0; i < 40; i++) {
+            particles.push(new Particle(x, y, secondaryColor, true));
+        }
+
+        // 彩色飄落彩帶 (20 條)
+        for (let i = 0; i < 20; i++) {
+            const ribbonColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+            particles.push(new Particle(x, y, ribbonColor, false, true));
         }
     }
 
@@ -279,15 +311,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(launchInterval);
                 return;
             }
-            const x = Math.random() * (canvas.width * 0.8) + (canvas.width * 0.1);
-            const y = Math.random() * (canvas.height * 0.5) + (canvas.height * 0.1);
-            createFireworkExplosion(x, y);
+            // 隨機雙重連環噴發
+            const x1 = Math.random() * (canvas.width * 0.8) + (canvas.width * 0.1);
+            const y1 = Math.random() * (canvas.height * 0.45) + (canvas.height * 0.1);
+            createFireworkExplosion(x1, y1);
+
+            if (Math.random() > 0.4) {
+                const x2 = Math.random() * (canvas.width * 0.8) + (canvas.width * 0.1);
+                const y2 = Math.random() * (canvas.height * 0.45) + (canvas.height * 0.1);
+                createFireworkExplosion(x2, y2);
+            }
             
             launchCounter++;
-            if (launchCounter >= 25 && !alarmModal.classList.contains('active')) {
+            if (launchCounter >= 40 && !alarmModal.classList.contains('active')) {
                 clearInterval(launchInterval);
             }
-        }, 300);
+        }, 200);
 
         function animate() {
             if (!isFireworksRunning && particles.length === 0) {
@@ -296,8 +335,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.25)'; // 微暗底色襯托燦爛煙火
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.globalCompositeOperation = 'lighter'; // 光度疊加模式，煙火極致發光
 
             for (let i = particles.length - 1; i >= 0; i--) {
                 particles[i].update();
