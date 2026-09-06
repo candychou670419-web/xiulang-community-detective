@@ -215,7 +215,7 @@
             gap: 6px;
             overflow-x: auto;
             padding-bottom: 2px;
-            scrollbar-width: none; /* 隱藏滾動條提升手機審美 */
+            scrollbar-width: none;
         }
 
         .quick-tags::-webkit-scrollbar {
@@ -384,7 +384,6 @@
             opacity: 0.8;
         }
 
-        /* 打字中的動畫小圓點 */
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -412,7 +411,6 @@
             40% { transform: scale(1); }
         }
 
-        /* 輸入區 Footer (底部直式導向設計) */
         .chat-footer {
             padding: 10px 14px 16px 14px;
             background-color: #ffffff;
@@ -480,7 +478,6 @@
             text-decoration: none;
         }
 
-        /* 當在真實手機滿版 (Screen <= 500px) 時自動適應滿版全螢幕 */
         @media (max-width: 500px) {
             body {
                 background: #ffffff;
@@ -494,16 +491,14 @@
                 border: none;
             }
             .status-bar {
-                display: none; /* 真實手機已有系統狀態欄，隱藏模擬列 */
+                display: none;
             }
         }
     </style>
 </head>
 <body>
 
-<!-- 直式手機版容器 (Mobile Viewport Simulator) -->
 <div class="mobile-frame">
-    <!-- 擬真頂部狀態列 -->
     <div class="status-bar">
         <span>9:41</span>
         <div class="notch"></div>
@@ -514,7 +509,6 @@
         </div>
     </div>
 
-    <!-- 頁首 Header -->
     <header class="bot-header">
         <div class="bot-profile">
             <div class="bot-avatar">
@@ -530,7 +524,6 @@
         </div>
     </header>
 
-    <!-- 跑馬燈動態公告 -->
     <div class="notice-bar">
         <i class="fa-solid fa-bullhorn"></i>
         <div class="notice-text">
@@ -538,7 +531,6 @@
         </div>
     </div>
 
-    <!-- 快捷按鈕標籤區 (手機橫滑體驗) -->
     <div class="quick-tags-wrapper">
         <div class="quick-tags-title">
             <i class="fa-solid fa-fire" style="color:#ff7e5f;"></i> 熱門親師查詢快捷鍵（按一下回覆）：
@@ -557,7 +549,6 @@
         </div>
     </div>
 
-    <!-- 對話視窗內容區 -->
     <div class="chat-body" id="chatBody">
         <div class="message-row bot">
             <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
@@ -573,7 +564,6 @@
         </div>
     </div>
 
-    <!-- 底部輸入區 -->
     <footer class="chat-footer">
         <form class="input-form" onsubmit="handleUserInput(event)">
             <input type="text" id="userInput" placeholder="請輸入問題（如：午餐退費、分機、行事曆）" autocomplete="off">
@@ -588,7 +578,6 @@
 <script>
     document.getElementById('initTime').innerText = getCurrentTime();
 
-    // 秀朗國小知識庫 Knowledge Base
     const knowledgeBase = [
         {
             keywords: ["午餐", "退費", "退餐", "菜單", "食材", "便當", "團膳"],
