@@ -1,876 +1,1069 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>秀秀機器人 - 秀朗國小家長諮詢服務助理</title>
-    <!-- FontAwesome 圖示庫 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts 繁體中文標準字體 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #2b7a78;
-            --primary-light: #3aafa9;
-            --primary-dark: #17252a;
-            --bg-color: #eef5f5;
-            --chat-bg: #ffffff;
-            --bot-bubble: #e8f4f3;
-            --user-bubble: #2b7a78;
-            --user-text: #ffffff;
-            --bot-text: #2d3748;
-            --accent-color: #ff7e5f;
-            --card-border: #def2f1;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
-            --radius-lg: 18px;
-            --radius-md: 12px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社區小偵探：尋找秀朗神祕守護者｜實境解謎互動遊戲</title>
+  <!-- Canvas Confetti Library for victory effects -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- HTML2Canvas for downloading certificate -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --accent-color: #f59e0b;
+      --bg-color: #eff6ff;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --success-green: #10b981;
+      --danger-red: #ef4444;
+      --font-family: 'PingFang TC', 'Microsoft JhengHei', 'Helvetica Neue', sans-serif;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        body {
-            background-color: #d8e6e5;
-            background-image: radial-gradient(#3aafa9 0.7px, transparent 0.7px), radial-gradient(#3aafa9 0.7px, #d8e6e5 0.7px);
-            background-size: 24px 24px;
-            background-position: 0 0, 12px 12px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-            color: var(--bot-text);
-            overflow: hidden;
-        }
+    body {
+      background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+    }
 
-        /* 外層桌面上直式手機模型 Frame (Mobile Viewport Simulator) */
-        .mobile-frame {
-            width: 100%;
-            max-width: 430px; /* iPhone 15 Pro Max 寬度標竿 */
-            height: 100vh;
-            max-height: 900px;
-            background: var(--chat-bg);
-            border-radius: 40px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22), 0 0 0 12px #22252a;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
+    /* Container */
+    #app-container {
+      width: 100%;
+      max-width: 768px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      min-height: 640px;
+    }
 
-        /* 擬真手機動態島 / 劉海極小頂欄 */
-        .status-bar {
-            height: 38px;
-            background-color: var(--primary-dark);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 22px;
-            font-size: 0.78rem;
-            font-weight: 500;
-            z-index: 10;
-            flex-shrink: 0;
-        }
+    /* Header Bar */
+    header {
+      background: linear-gradient(90deg, #2563eb, #3b82f6);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+    }
 
-        .status-bar .notch {
-            width: 100px;
-            height: 18px;
-            background-color: #000000;
-            border-radius: 12px;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 6px;
-        }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        /* 頁首 Header */
-        .bot-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            color: white;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            flex-shrink: 0;
-        }
+    .brand-title span.badge {
+      background: var(--accent-color);
+      color: #000;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
 
-        .bot-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    /* Gem inventory */
+    .gems-tracker {
+      display: flex;
+      gap: 6px;
+      background: rgba(255,255,255,0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
 
-        .bot-avatar {
-            width: 42px;
-            height: 42px;
-            background-color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: var(--primary-color);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-            position: relative;
-        }
+    .gem-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: #aaa;
+      transition: all 0.4s ease;
+      border: 2px solid transparent;
+    }
 
-        .bot-avatar::after {
-            content: '';
-            position: absolute;
-            bottom: 1px;
-            right: 1px;
-            width: 10px;
-            height: 10px;
-            background-color: #4cd964;
-            border: 2px solid white;
-            border-radius: 50%;
-        }
+    .gem-icon.unlocked {
+      background: #fbbf24;
+      color: #78350f;
+      border-color: #ffffff;
+      box-shadow: 0 0 10px #fbbf24;
+      transform: scale(1.1);
+    }
 
-        .bot-info h1 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
+    /* Speech synthesis audio btn */
+    .audio-btn {
+      background: #fef08a;
+      color: #854d0e;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
+    }
+    .audio-btn:active {
+      transform: scale(0.95);
+    }
 
-        .bot-info p {
-            font-size: 0.75rem;
-            opacity: 0.92;
-        }
+    /* Content Screens */
+    .screen {
+      display: none;
+      padding: 24px 20px;
+      animation: fadeIn 0.4s ease forwards;
+    }
 
-        .header-actions button {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-        }
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
 
-        .header-actions button:hover {
-            background: rgba(255, 255, 255, 0.35);
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        /* 跑馬燈廣播欄 */
-        .notice-bar {
-            background-color: #fff8e1;
-            border-bottom: 1px solid #ffe0b2;
-            padding: 7px 14px;
-            font-size: 0.78rem;
-            color: #b78103;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            overflow: hidden;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
+    /* Story / Welcome */
+    .story-card {
+      background: #f0fdf4;
+      border: 2px dashed #4ade80;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
 
-        .notice-text {
-            animation: marquee 18s linear infinite;
-            display: inline-block;
-        }
+    .character-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
 
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+    .owl-avatar {
+      width: 70px;
+      height: 70px;
+      background: #fef3c7;
+      border: 3px solid #f59e0b;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      animation: bounce 2s infinite ease-in-out;
+    }
 
-        /* 熱門快捷標籤橫滑列 */
-        .quick-tags-wrapper {
-            padding: 10px 14px;
-            background-color: #f7fcfc;
-            border-bottom: 1px solid #edf7f6;
-            flex-shrink: 0;
-        }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
 
-        .quick-tags-title {
-            font-size: 0.76rem;
-            font-weight: 700;
-            color: #5a6a85;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+    .story-text {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #334155;
+    }
 
-        .quick-tags {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 2px;
-            scrollbar-width: none; /* 隱藏滾動條提升手機審美 */
-        }
+    /* Map View */
+    .map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
 
-        .quick-tags::-webkit-scrollbar {
-            display: none;
-        }
+    .station-card {
+      background: #ffffff;
+      border: 3px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
 
-        .tag-btn {
-            background-color: #ffffff;
-            border: 1.2px solid var(--primary-light);
-            color: var(--primary-color);
-            padding: 5px 12px;
-            border-radius: 18px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-        }
+    .station-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
 
-        .tag-btn:active {
-            background-color: var(--primary-color);
-            color: white;
-            transform: scale(0.96);
-        }
+    .station-card.completed {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
 
-        /* 直式手機對話內容主區 */
-        .chat-body {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            background-color: #ffffff;
-            scrollbar-width: thin;
-        }
+    .station-badge-icon {
+      font-size: 3rem;
+      margin-bottom: 8px;
+    }
 
-        .message-row {
-            display: flex;
-            gap: 10px;
-            max-width: 90%;
-            animation: fadeIn 0.25s ease-in-out;
-        }
+    .station-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .station-subtitle {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
 
-        .message-row.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
+    .completed-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #10b981;
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
 
-        .msg-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary-light);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-            box-shadow: var(--shadow-sm);
-        }
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(37,99,235,0.3);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
 
-        .message-row.user .msg-avatar {
-            background: var(--accent-color);
-        }
+    .btn:active {
+      transform: scale(0.97);
+    }
 
-        .msg-content {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 6px 16px rgba(16,185,129,0.3);
+    }
 
-        .msg-bubble {
-            padding: 12px 15px;
-            border-radius: var(--radius-lg);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            word-break: break-word;
-        }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+      box-shadow: none;
+    }
 
-        .message-row.bot .msg-bubble {
-            background-color: var(--bot-bubble);
-            color: var(--bot-text);
-            border-top-left-radius: 4px;
-            border: 1px solid #d4ecea;
-        }
+    /* Puzzle 1: Book Password */
+    .book-callnum {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      padding: 12px;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 2px;
+      color: #b45309;
+      margin: 12px 0;
+    }
 
-        .message-row.user .msg-bubble {
-            background-color: var(--user-bubble);
-            color: var(--user-text);
-            border-top-right-radius: 4px;
-        }
+    .word-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px 0;
+    }
 
-        .msg-time {
-            font-size: 0.68rem;
-            color: #a0aec0;
-            align-self: flex-end;
-            margin: 0 2px;
-        }
+    .word-chip {
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-        .message-row.user .msg-time {
-            align-self: flex-start;
-        }
+    .word-chip.selected {
+      background: #3b82f6;
+      color: white;
+      border-color: #1d4ed8;
+      transform: scale(1.05);
+    }
 
-        /* 直式卡片 UI */
-        .bot-card {
-            background: #ffffff;
-            border: 1px solid #cce8e6;
-            border-radius: var(--radius-md);
-            padding: 12px;
-            margin-top: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
+    .answer-box {
+      min-height: 50px;
+      background: #fafafa;
+      border: 2px dashed #94a3b8;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 16px;
+      padding: 8px;
+    }
 
-        .bot-card-title {
-            font-weight: 700;
-            font-size: 0.88rem;
-            color: var(--primary-color);
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border-bottom: 1px dashed #cce8e6;
-            padding-bottom: 5px;
-        }
+    /* Puzzle 2: Police Eyes */
+    .quiz-option {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
 
-        .link-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 8px;
-        }
+    .quiz-option:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
 
-        .link-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 9px 12px;
-            background-color: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 0.82rem;
-            font-weight: 500;
-            transition: all 0.15s;
-        }
+    .quiz-option.active {
+      border-color: #3b82f6;
+      background: #dbeafe;
+      color: #1e40af;
+    }
 
-        .link-btn:active {
-            background-color: var(--primary-light);
-            color: white;
-        }
+    /* Puzzle 3: Ecology Bingo */
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
 
-        .link-btn i {
-            font-size: 0.7rem;
-            opacity: 0.8;
-        }
+    .bingo-card {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.3s;
+    }
 
-        /* 打字中的動畫小圓點 */
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 10px 14px;
-            background-color: var(--bot-bubble);
-            border-radius: var(--radius-lg);
-            border-top-left-radius: 4px;
-            width: fit-content;
-        }
+    .bingo-card.checked {
+      background: #dcfce7;
+      border-color: #22c55e;
+      transform: scale(0.98);
+      position: relative;
+    }
 
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--primary-light);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
+    .bingo-card.checked::after {
+      content: '✓';
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      background: #22c55e;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
 
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .bingo-icon {
+      font-size: 2.2rem;
+      margin-bottom: 4px;
+    }
 
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
+    .bingo-label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #334155;
+    }
 
-        /* 輸入區 Footer (底部直式導向設計) */
-        .chat-footer {
-            padding: 10px 14px 16px 14px;
-            background-color: #ffffff;
-            border-top: 1px solid #edf7f6;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex-shrink: 0;
-        }
+    /* Puzzle 4: Market Money */
+    .money-container {
+      background: #fffbebfb;
+      border: 2px solid #fcd34d;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 12px 0;
+      text-align: center;
+    }
 
-        .input-form {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: #f7fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 25px;
-            padding: 4px 6px 4px 14px;
-            transition: all 0.2s;
-        }
+    .coin-display {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 12px 0;
+    }
 
-        .input-form:focus-within {
-            border-color: var(--primary-light);
-            background-color: #ffffff;
-            box-shadow: 0 0 0 2px rgba(58, 175, 169, 0.15);
-        }
+    .coin {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+    }
 
-        .input-form input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 0.88rem;
-            color: var(--bot-text);
-        }
+    .coin:active {
+      transform: scale(0.9);
+    }
 
-        .send-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
+    .coin-10 {
+      background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+      border: 3px solid #64748b;
+      color: #1e293b;
+    }
 
-        .send-btn:active {
-            transform: scale(0.92);
-        }
+    .coin-5 {
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      border: 3px solid #d97706;
+      color: #78350f;
+    }
 
-        .footer-note {
-            text-align: center;
-            font-size: 0.7rem;
-            color: #a0aec0;
-        }
+    .coin-1 {
+      background: linear-gradient(135deg, #fdba74, #ea580c);
+      border: 3px solid #c2410c;
+      color: #ffffff;
+    }
 
-        .footer-note a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
+    /* Certificate Screen */
+    .certificate-card {
+      background: #ffffff;
+      border: 8px double #d97706;
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      background-image: radial-gradient(#fef3c7 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
 
-        /* 當在真實手機滿版 (Screen <= 500px) 時自動適應滿版全螢幕 */
-        @media (max-width: 500px) {
-            body {
-                background: #ffffff;
-            }
-            .mobile-frame {
-                max-width: 100%;
-                height: 100vh;
-                max-height: 100vh;
-                border-radius: 0;
-                box-shadow: none;
-                border: none;
-            }
-            .status-bar {
-                display: none; /* 真實手機已有系統狀態欄，隱藏模擬列 */
-            }
-        }
-    </style>
+    .cert-header {
+      font-size: 1.6rem;
+      color: #92400e;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .cert-seal {
+      width: 80px;
+      height: 80px;
+      background: #dc2626;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px auto;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 4px solid #fef2f2;
+      box-shadow: 0 4px 12px rgba(220,38,38,0.4);
+      writing-mode: vertical-rl;
+      letter-spacing: 2px;
+    }
+
+    .input-group {
+      margin: 16px 0;
+    }
+
+    .input-field {
+      width: 80%;
+      padding: 12px;
+      font-size: 1.2rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-<!-- 直式手機版容器 (Mobile Viewport Simulator) -->
-<div class="mobile-frame">
-    <!-- 擬真頂部狀態列 -->
-    <div class="status-bar">
-        <span>9:41</span>
-        <div class="notch"></div>
+<div id="app-container">
+  <!-- Header -->
+  <header>
+    <div class="brand-title">
+      🕵️‍♂️ 社區小偵探 <span class="badge">二年級版</span>
+    </div>
+    <!-- Gem Inventory -->
+    <div class="gems-tracker">
+      <div class="gem-icon" id="gem-1" title="民權圖書館：知">知</div>
+      <div class="gem-icon" id="gem-2" title="得和派出所：正">正</div>
+      <div class="gem-icon" id="gem-3" title="瓦窯溝：愛">愛</div>
+      <div class="gem-icon" id="gem-4" title="民治市場：合">合</div>
+    </div>
+  </header>
+
+  <!-- SCREEN 0: STORY / WELCOME -->
+  <div id="screen-story" class="screen active">
+    <div class="story-card">
+      <div class="character-box">
+        <div class="owl-avatar">🦉</div>
         <div>
-            <i class="fa-solid fa-signal"></i>
-            <i class="fa-solid fa-wifi" style="margin: 0 4px;"></i>
-            <i class="fa-solid fa-battery-full"></i>
+          <h2 style="color: #92400e;">秀朗守護者求救信！</h2>
+          <p style="font-size: 0.9rem; color: #65a30d; font-weight: bold;">秀朗國小專屬實境解謎遊戲</p>
         </div>
+      </div>
+      <button class="audio-btn" onclick="speakText(document.getElementById('story-content').innerText)">
+        🔊 聽貓頭鷹隊長說話
+      </button>
+      <div class="story-text" id="story-content">
+        親愛的小偵探：<br>
+        我是社區守護者小貓頭鷹！秀朗社區的「神奇守護寶石」被藏在四個重要的秘密地點。<br>
+        請你們帶著平板，前往<b>【民權圖書館】</b>、<b>【得和派出所】</b>、<b>【瓦窯溝】</b>與<b>【民治市場】</b>，解開四道謎題，收集<b>【知、正、愛、合】</b>四顆寶石，召喚守護者吧！
+      </div>
     </div>
 
-    <!-- 頁首 Header -->
-    <header class="bot-header">
-        <div class="bot-profile">
-            <div class="bot-avatar">
-                <i class="fa-solid fa-robot"></i>
-            </div>
-            <div class="bot-info">
-                <h1>秀秀機器人</h1>
-                <p><i class="fa-solid fa-graduation-cap"></i> 秀朗國小親師助理</p>
-            </div>
-        </div>
-        <div class="header-actions">
-            <button onclick="clearChat()" title="重置對話"><i class="fa-solid fa-rotate-right"></i></button>
-        </div>
-    </header>
+    <div style="margin-top: auto;">
+      <button class="btn btn-success" onclick="navigateTo('map')">
+        🚀 出發！開啟社區探索地圖
+      </button>
+    </div>
+  </div>
 
-    <!-- 跑馬燈動態公告 -->
-    <div class="notice-bar">
-        <i class="fa-solid fa-bullhorn"></i>
-        <div class="notice-text">
-            歡迎使用【秀秀機器人】直式親師通！提供午餐退費、電子校刊、學年度行事曆、處室分機等官網直達連結！
-        </div>
+  <!-- SCREEN MAP: MAIN MAP -->
+  <div id="screen-map" class="screen">
+    <button class="audio-btn" onclick="speakText('請選擇你要探索的社區站點，或是用平板掃描現場的 QR Code！')">
+      🔊 點擊播放語音提示
+    </button>
+    <h2 style="margin-bottom: 6px;">🗺️ 社區實境解謎地圖</h2>
+    <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 12px;">點選站點解謎，或掃描現場實體 QR Code！</p>
+
+    <div class="map-grid">
+      <!-- Station 1 -->
+      <div class="station-card" id="card-st1" onclick="navigateTo('station1')">
+        <div class="station-badge-icon">📚</div>
+        <div class="station-title">第一站：民權圖書館</div>
+        <div class="station-subtitle">【文字解密】圖書密碼鎖</div>
+        <div class="completed-tag" id="tag-st1" style="display:none;">已通關 ✓</div>
+      </div>
+
+      <!-- Station 2 -->
+      <div class="station-card" id="card-st2" onclick="navigateTo('station2')">
+        <div class="station-badge-icon">👮‍♂️</div>
+        <div class="station-title">第二站：得和派出所</div>
+        <div class="station-subtitle">【觀察辨識】眼力大考驗</div>
+        <div class="completed-tag" id="tag-st2" style="display:none;">已通關 ✓</div>
+      </div>
+
+      <!-- Station 3 -->
+      <div class="station-card" id="card-st3" onclick="navigateTo('station3')">
+        <div class="station-badge-icon">🌿</div>
+        <div class="station-title">第三站：瓦窯溝</div>
+        <div class="station-subtitle">【生態探索】河畔 Bingo</div>
+        <div class="completed-tag" id="tag-st3" style="display:none;">已通關 ✓</div>
+      </div>
+
+      <!-- Station 4 -->
+      <div class="station-card" id="card-st4" onclick="navigateTo('station4')">
+        <div class="station-badge-icon">🍎</div>
+        <div class="station-title">第四站：民治市場</div>
+        <div class="station-subtitle">【金錢運用】30元探險家</div>
+        <div class="completed-tag" id="tag-st4" style="display:none;">已通關 ✓</div>
+      </div>
     </div>
 
-    <!-- 快捷按鈕標籤區 (手機橫滑體驗) -->
-    <div class="quick-tags-wrapper">
-        <div class="quick-tags-title">
-            <i class="fa-solid fa-fire" style="color:#ff7e5f;"></i> 熱門親師查詢快捷鍵（按一下回覆）：
-        </div>
-        <div class="quick-tags">
-            <button class="tag-btn" onclick="sendQuickQuery('午餐退費')"><i class="fa-solid fa-utensils"></i> 午餐退費</button>
-            <button class="tag-btn" onclick="sendQuickQuery('學年度行事曆')"><i class="fa-solid fa-calendar-days"></i> 行事曆作息</button>
-            <button class="tag-btn" onclick="sendQuickQuery('辦公室分機')"><i class="fa-solid fa-phone"></i> 全校分機表</button>
-            <button class="tag-btn" onclick="sendQuickQuery('電子校刊影音')"><i class="fa-solid fa-newspaper"></i> 校刊與影音</button>
-            <button class="tag-btn" onclick="sendQuickQuery('小一新生專區')"><i class="fa-solid fa-child-reaching"></i> 新生報到須知</button>
-            <button class="tag-btn" onclick="sendQuickQuery('課後照顧班')"><i class="fa-solid fa-clock"></i> 課後班與社團</button>
-            <button class="tag-btn" onclick="sendQuickQuery('請假與健康')"><i class="fa-solid fa-notes-medical"></i> 請假傳染病</button>
-            <button class="tag-btn" onclick="sendQuickQuery('親師生平台')"><i class="fa-solid fa-laptop"></i> 親師平台校園通</button>
-            <button class="tag-btn" onclick="sendQuickQuery('課表查詢')"><i class="fa-solid fa-table-list"></i> 班級課表</button>
-            <button class="tag-btn" onclick="sendQuickQuery('行政處室網頁')"><i class="fa-solid fa-sitemap"></i> 各處室網站</button>
-        </div>
+    <div style="margin-top: 24px;">
+      <button class="btn btn-success" id="btn-final-cert" onclick="navigateTo('certificate')" style="display: none;">
+        🏆 集齊 4 顆寶石！領取榮譽證書
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 1: MINQUAN LIBRARY -->
+  <div id="screen-station1" class="screen">
+    <button class="audio-btn" onclick="speakText(document.getElementById('st1-prompt').innerText)">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>📚 第一站：民權圖書館（圖書密碼鎖）</h2>
+
+    <div class="story-card" id="st1-prompt">
+      <b>任務提示：</b><br>
+      請在圖書館中尋找「神祕索書號」卡片所標示的書籍！打開書本指定頁碼，找到知識密碼。
     </div>
 
-    <!-- 對話視窗內容區 -->
-    <div class="chat-body" id="chatBody">
-        <div class="message-row bot">
-            <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-            <div class="msg-content">
-                <div class="msg-bubble">
-                    您好！我是秀朗國小的 <strong>秀秀機器人</strong> 🤖🍎<br>
-                    專為秀朗國小家長服務！無論您想尋找 <strong>午餐退費、學年度行事曆、辦公室電話分機、電子校刊影音</strong>，或是 <strong>小一新生報到、課後照顧班</strong>，我都可以提供秀朗國小官網直達連結喔！
-                    <br><br>
-                    您可以點擊上方快捷鍵，或在下方輸入問題詢問～
-                </div>
-                <div class="msg-time" id="initTime"></div>
-            </div>
-        </div>
+    <div class="book-callnum">
+      索書號：J 520 1234
     </div>
 
-    <!-- 底部輸入區 -->
-    <footer class="chat-footer">
-        <form class="input-form" onsubmit="handleUserInput(event)">
-            <input type="text" id="userInput" placeholder="請輸入問題（如：午餐退費、分機、行事曆）" autocomplete="off">
-            <button type="submit" class="send-btn" title="傳送"><i class="fa-solid fa-paper-plane"></i></button>
-        </form>
-        <div class="footer-note">
-            新北市秀朗國小官網: <a href="https://www.hles.ntpc.edu.tw/" target="_blank">www.hles.ntpc.edu.tw</a>
-        </div>
-    </footer>
+    <p style="font-weight: bold; margin-bottom: 8px;">請點擊下列字詞，組合出書中的關鍵密碼：</p>
+    
+    <div class="answer-box" id="st1-answer-box">
+      <span style="color:#cbd5e1;">(點選下方字詞填入)</span>
+    </div>
+
+    <div class="word-chips-container" id="st1-chips">
+      <div class="word-chip" onclick="toggleSt1Chip(this, '知')">知</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '識')">識</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '就')">就</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '是')">是</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '力')">力</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '量')">量</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '快')">快</div>
+      <div class="word-chip" onclick="toggleSt1Chip(this, '樂')">樂</div>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation1()">提交驗證</button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 2: POLICE STATION -->
+  <div id="screen-station2" class="screen">
+    <button class="audio-btn" onclick="speakText(document.getElementById('st2-prompt').innerText)">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>👮‍♂️ 第二站：得和派出所（波麗士眼力大考驗）</h2>
+
+    <div class="story-card" id="st2-prompt">
+      <b>觀察任務：</b><br>
+      觀察得和派出所門口警徽與告示牌，回答下列波麗士小問題！
+    </div>
+
+    <p style="font-weight: bold; margin-bottom: 8px;">問題一：警察伯伯警徽上有幾顆金黃色星芒？</p>
+    <div id="q1-options">
+      <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">A. 3 顆星</div>
+      <div class="quiz-option" onclick="selectQuiz('q1', 5, this)">B. 5 顆星</div>
+      <div class="quiz-option" onclick="selectQuiz('q1', 8, this)">C. 8 顆星</div>
+    </div>
+
+    <p style="font-weight: bold; margin: 12px 0 8px 0;">問題二：遇緊急狀況想向派出所求助，應該撥打電話號碼？</p>
+    <div id="q2-options">
+      <div class="quiz-option" onclick="selectQuiz('q2', 110, this)">A. 110 (報案專線)</div>
+      <div class="quiz-option" onclick="selectQuiz('q2', 119, this)">B. 119 (火災救護)</div>
+      <div class="quiz-option" onclick="selectQuiz('q2', 113, this)">C. 113 (家暴保護)</div>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation2()">提交驗證</button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 3: ECO BINGO -->
+  <div id="screen-station3" class="screen">
+    <button class="audio-btn" onclick="speakText('請沿著瓦窯溝步道觀察，發現現場有的自然景觀就點擊點亮卡牌，連成兩條線即可解鎖！')">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>🌿 第三站：瓦窯溝（河畔生態 Bingo 卡）</h2>
+    <p style="color: #64748b; font-size: 0.9rem;">沿步道實地觀察，點亮看到的生態夥伴，連成 <b>2 條線</b> 即可通關！</p>
+
+    <div class="bingo-grid" id="bingo-board">
+      <!-- 3x3 Grid generated via JS -->
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation3()">驗證 Bingo 連線</button>
+    </div>
+  </div>
+
+  <!-- SCREEN STATION 4: MARKET MONEY -->
+  <div id="screen-station4" class="screen">
+    <button class="audio-btn" onclick="speakText('小偵探拿 30 元買了 15 元紅豆餅與 10 元冬瓜茶，請算算看老闆要找回多少錢？')">
+      🔊 聽關卡任務說明
+    </button>
+    <h2>🍎 第四站：民治市場（30元美食探險家）</h2>
+
+    <div class="story-card">
+      <b>購物任務算數挑戰：</b><br>
+      你拿著 <b>30 元</b>（3張10元），買了一份 <b>15 元</b> 古早味紅豆餅與一杯 <b>10 元</b> 冬瓜茶。<br>
+      1. 一共花了多少錢？ (15 + 10 = ?)<br>
+      2. 老闆應該找回你多少錢？ (30 - 花費 = ?)
+    </div>
+
+    <div class="money-container">
+      <p style="font-weight: bold; margin-bottom: 8px;">請點擊硬幣放入錢包，拿回正確找零金額 (目標找回：<span id="target-change" style="color: #d97706; font-size: 1.2rem;">5</span> 元)：</p>
+      
+      <div class="coin-display">
+        <div class="coin coin-10" onclick="addCoin(10)">$10</div>
+        <div class="coin coin-5" onclick="addCoin(5)">$5</div>
+        <div class="coin coin-1" onclick="addCoin(1)">$1</div>
+      </div>
+
+      <div style="font-size: 1.2rem; font-weight: bold; color: #1e293b; margin-top: 10px;">
+        目前拿到的找零：<span id="current-change-val" style="color: #2563eb; font-size: 1.5rem;">0</span> 元
+      </div>
+      <button style="background: none; border: none; color: #dc2626; text-decoration: underline; cursor: pointer; margin-top: 6px;" onclick="resetCoins()">重新點算硬幣</button>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
+      <button class="btn" onclick="verifyStation4()">提交購物找零結果</button>
+    </div>
+  </div>
+
+  <!-- SCREEN CERTIFICATE -->
+  <div id="screen-certificate" class="screen">
+    <h2>🏆 闖關成功！喚醒秀朗守護者</h2>
+
+    <div class="certificate-card" id="cert-print-area">
+      <div style="font-size: 3rem; margin-bottom: 4px;">🦉✨</div>
+      <div class="cert-header">秀朗社區小偵探 榮譽證書</div>
+      
+      <p style="font-size: 1rem; color: #475569; margin-bottom: 12px;">
+        恭喜完成【民權圖書館、得和派出所、瓦窯溝、民治市場】實境解謎任務！
+      </p>
+
+      <div class="input-group">
+        <label style="display:block; font-weight:bold; margin-bottom:4px;">小偵探組別 / 姓名：</label>
+        <input type="text" id="student-name-input" class="input-field" placeholder="例如：二年一班 第一組" value="秀朗小偵探">
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 12px; margin: 16px 0;">
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【知】智慧寶石</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【正】正義寶石</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【愛】生態寶石</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【合】合作寶石</span>
+      </div>
+
+      <div class="cert-seal">秀朗認證</div>
+
+      <p style="font-size: 0.85rem; color: #94a3b8;" id="cert-date-str"></p>
+    </div>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+      <button class="btn btn-success" onclick="downloadCertificate()">
+        📸 儲存 / 下載數位證書
+      </button>
+      <button class="btn btn-secondary" onclick="navigateTo('map')">
+        返回社區地圖
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
-    document.getElementById('initTime').innerText = getCurrentTime();
+  // Game State
+  const state = {
+    unlockedGems: { st1: false, st2: false, st3: false, st4: false },
+    st1SelectedWords: [],
+    st2Answers: { q1: null, q2: null },
+    st3BingoState: Array(9).fill(false),
+    st4CurrentCoins: 0
+  };
 
-    // 秀朗國小知識庫 Knowledge Base
-    const knowledgeBase = [
-        {
-            keywords: ["午餐", "退費", "退餐", "菜單", "食材", "便當", "團膳"],
-            title: "🍱 營養午餐、退餐申請與菜單",
-            summary: "秀朗國小提供線上退餐申請表單與每週菜單查詢：",
-            links: [
-                { text: "營養午餐退餐申請表單 (退餐不退費)", url: "https://docs.google.com/forms/d/e/1FAIpQLSd6oKjIolclw0xAbjv9kvZc30yO4BENrmjn6nu4eR1amP2TBg/viewform?usp=sf_link" },
-                { text: "秀朗國小每週午餐菜單公告", url: "https://www.hles.ntpc.edu.tw/p/412-1000-779.php?Lang=zh-tw" },
-                { text: "教育部校園食材登錄平臺 (秀朗國小專區)", url: "https://fatraceschool.k12ea.gov.tw/frontend/search.html?school=14642&period=2023-04-17" },
-                { text: "115學年度午餐用餐公告通知", url: "https://www.hles.ntpc.edu.tw/p/406-1000-11235,r43.php?Lang=zh-tw" }
-            ]
-        },
-        {
-            keywords: ["行事曆", "時間", "開學", "放假", "段考", "作息", "放學", "上學"],
-            title: "📅 學年度行事曆與作息時間公告",
-            summary: "點擊下方連結檢視秀朗國小最新學年度行事曆與作息：",
-            links: [
-                { text: "115學年度一年級新生重要行事曆", url: "https://www.hles.ntpc.edu.tw/p/404-1000-10866.php?Lang=zh-tw" },
-                { text: "115學年度秀朗國小上放學時間及作息公告", url: "https://www.hles.ntpc.edu.tw/p/406-1000-11235,r43.php?Lang=zh-tw" },
-                { text: "115學年度公開授課行事曆", url: "https://docs.google.com/document/d/1V8A2xQaGhROLD7varFhc2yqJEeOP4714/edit?usp=sharing" },
-                { text: "秀朗國小官方首頁 (最新消息)", url: "https://www.hles.ntpc.edu.tw/" }
-            ]
-        },
-        {
-            keywords: ["分機", "電話", "辦公室", "聯絡", "教務處分機", "學務處分機", "總務處分機", "輔導處分機"],
-            title: "📞 全校辦公室與教室分機表",
-            summary: "秀朗國小總機電話為 (02) 2942-0451。詳細分機表如下：",
-            links: [
-                { text: "📄 下載全校辦公室及教室分機表 (PDF)", url: "https://www.hles.ntpc.edu.tw/var/file/0/1000/img/143/966156244.pdf" },
-                { text: "🗺️ 下載教室與處室配置圖 (PDF)", url: "https://www.hles.ntpc.edu.tw/var/file/0/1000/img/143/727435935.pdf" },
-                { text: "✉️ 校務反應信箱 (Google Form)", url: "https://forms.gle/ABcbFETJASUL9zQX8" }
-            ]
-        },
-        {
-            keywords: ["校刊", "電子校刊", "影音", "新聞", "FB", "臉書", "youtube", "影片", "相簿", "畢業典禮"],
-            title: "📰 電子校刊、秀朗影音與社群",
-            summary: "歡迎關注秀朗國小 YouTube 頻道、官方 FB 與特刊：",
-            links: [
-                { text: "秀朗國小官方 YouTube 頻道", url: "https://www.youtube.com/@newtaipeicityxiulangelemen9776" },
-                { text: "秀朗國小官方 Facebook 粉絲專頁", url: "https://www.facebook.com/hles1976/" },
-                { text: "秀朗國小 50 週年校慶專網", url: "https://sites.google.com/hles.ntpc.edu.tw/hles50anniv/%E9%A6%96%E9%A0%81" },
-                { text: "畢業典禮精彩照片相簿", url: "https://drive.google.com/drive/folders/1AwEW-KuteEk5yPXUZ0W8VKmwelkqyZJJ?usp=drive_link" }
-            ]
-        },
-        {
-            keywords: ["新生", "小一", "一年級", "報到", "新生報到", "新生專區", "幼稚園", "幼兒園"],
-            title: "👶 小一新生報到與表單專區",
-            summary: "小一新生家長請參考以下重要時程與報到須知：",
-            links: [
-                { text: "115學年度一年級新生報到重要時程", url: "https://www.hles.ntpc.edu.tw/p/404-1000-10846.php?Lang=zh-tw" },
-                { text: "115學年度一年級新生重要行事曆", url: "https://www.hles.ntpc.edu.tw/p/404-1000-10866.php?Lang=zh-tw" },
-                { text: "新生繳交資料 (表單下載區)", url: "https://www.hles.ntpc.edu.tw/p/404-1000-9860.php?Lang=zh-tw" },
-                { text: "小一新生課後照顧班簡章", url: "https://drive.google.com/file/d/14yn_ribQ_jgdnzIL-d7lcPQF5JKL-H9a/view?usp=drive_link" },
-                { text: "秀朗附設幼兒園網站", url: "https://hleskid.blogspot.com/" }
-            ]
-        },
-        {
-            keywords: ["課後班", "社團", "課後照顧", "羽球", "桌球", "運動隊"],
-            title: "🚌 課後照顧班與課後社團",
-            summary: "秀朗國小提供豐富的課後照顧與多元社團活動：",
-            links: [
-                { text: "115學年度第一學期課後照顧班簡章", url: "https://drive.google.com/file/d/1Yb65TIM3quDEkJ79g_IKsk-jzBkzyZER/view?usp=sharing" },
-                { text: "課後照顧班錄取名單公告", url: "https://drive.google.com/file/d/1LGIsOkguDuK6JCnmMSUn58AvV-4KhpkC/view?usp=drive_link" },
-                { text: "秀朗國小課後社團專區", url: "https://www.hles.ntpc.edu.tw/p/412-1000-750.php?Lang=zh-tw" },
-                { text: "秀朗學校社團 (羽球隊/桌球隊等)", url: "https://www.hles.ntpc.edu.tw/p/412-1000-749.php?Lang=zh-tw" }
-            ]
-        },
-        {
-            keywords: ["請假", "傳染病", "腸病毒", "流感", "健康中心", "發燒", "生病", "通報"],
-            title: "🏥 請假流程、健康中心與傳染病填報",
-            summary: "若學童因病請假或確診傳染病，請點選以下連結完成線上通報：",
-            links: [
-                { text: "學生傳染病填報表單 (Google Form)", url: "https://forms.gle/DNJ16RYrSkNQGu3H7" },
-                { text: "秀朗國小健康中心專屬網站", url: "https://sites.google.com/hles.ntpc.edu.tw/2942045152045206/%E9%A6%96%E9%A0%81?authuser=1" },
-                { text: "線上防疫會議與最新宣導", url: "https://meet.google.com/rbb-gzjh-msy" }
-            ]
-        },
-        {
-            keywords: ["親師生平台", "校園通", "app", "場地預約", "設備", "校務系統"],
-            title: "📱 親師生平台、校園通 APP 與場地預約",
-            summary: "常用資訊平台與校務系統相關連結：",
-            links: [
-                { text: "新北市親師生平台入口", url: "https://pts.ntpc.edu.tw/#!/links" },
-                { text: "《新北校園通 APP》使用教學", url: "https://drive.google.com/drive/folders/1egMJ5pZIvLNPzXwHE6hraxGcGlpHUzPz?usp=sharing" },
-                { text: "秀朗國小場地預約系統", url: "https://esa.ntpc.edu.tw/web-classmgt/template/pub/pubmain.html?schno=014642" },
-                { text: "秀朗雲端及網站登入", url: "https://sites.google.com/hles.ntpc.edu.tw/login/%E9%A6%96%E9%A0%81?authuser=1" }
-            ]
-        },
-        {
-            keywords: ["課表", "課表查詢", "上課", "科目"],
-            title: "📖 學生班級課表查詢系統",
-            summary: "直接至新北市校務系統查詢秀朗國小各班級課表：",
-            links: [
-                { text: "秀朗國小線上課表查詢系統", url: "https://esa.ntpc.edu.tw/web-lsnmgt/templates/timetable_print.html?show_type=1&showsub=lcname&showcls=classname&showprint=html&ss=WjZBK2prdkdQNXpHRmJYS0hDQzNiUT09" }
-            ]
-        },
-        {
-            keywords: ["教務處", "學務處", "總務處", "輔導處", "人事室", "會計室", "校長室", "處室"],
-            title: "🏫 秀朗國小各行政處室網站",
-            summary: "點選直達秀朗國小各處室專屬網站：",
-            links: [
-                { text: "秀朗國小 - 校長室網站", url: "https://sites.google.com/view/shiowju/%E9%A6%96%E9%A0%81" },
-                { text: "秀朗國小 - 教務處網站", url: "https://www.hles.ntpc.edu.tw/p/404-1000-4272.php?Lang=zh-tw" },
-                { text: "秀朗國小 - 學務處網站", url: "https://sites.google.com/view/hles5201" },
-                { text: "秀朗國小 - 總務處網站", url: "https://www.hles.ntpc.edu.tw/p/404-1000-6446.php?Lang=zh-tw" },
-                { text: "秀朗國小 - 輔導處網站", url: "https://bulls19tw.github.io/hles-counseling/" },
-                { text: "秀朗國小 - 圖書館網頁", url: "https://esa.ntpc.edu.tw/014642/library" }
-            ]
-        },
-        {
-            keywords: ["家長會", "志工", "家長會fb"],
-            title: "👨‍👩‍👧‍👦 家長會與志工專區",
-            summary: "歡迎家長加入秀朗大家庭與志工團隊：",
-            links: [
-                { text: "秀朗國家長會 FB 社團", url: "https://www.facebook.com/groups/xlparent/" },
-                { text: "秀朗國小志工隊專頁", url: "https://sites.google.com/hles.ntpc.edu.tw/fds-vtc" },
-                { text: "秀朗圖書館志工招募公告", url: "https://www.hles.ntpc.edu.tw/p/406-1000-11270,r43.php?Lang=zh-tw" }
-            ]
-        }
+  // Bingo Items Data
+  const bingoItems = [
+    { icon: '🕊️', name: '小白鷺' },
+    { icon: '🦢', name: '大公鵝' },
+    { icon: '🌳', name: '台灣欒樹' },
+    { icon: '💧', name: '水質淨化設施' },
+    { icon: '🐟', name: '大肚魚' },
+    { icon: '🦆', name: '紅冠水雞' },
+    { icon: '🌿', name: '柳樹' },
+    { icon: '🦋', name: '蝴蝶' },
+    { icon: '🌱', name: '淨水植物' }
+  ];
+
+  // Load saved state
+  function loadSavedState() {
+    const saved = localStorage.getItem('xiulang_escape_game');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        state.unlockedGems = parsed.unlockedGems || state.unlockedGems;
+      } catch(e){}
+    }
+    updateGemUI();
+  }
+
+  function saveState() {
+    localStorage.setItem('xiulang_escape_game', JSON.stringify({ unlockedGems: state.unlockedGems }));
+    updateGemUI();
+  }
+
+  function updateGemUI() {
+    ['st1', 'st2', 'st3', 'st4'].forEach((st, idx) => {
+      const gemEl = document.getElementById(`gem-${idx+1}`);
+      const tagEl = document.getElementById(`tag-${st}`);
+      const cardEl = document.getElementById(`card-${st}`);
+
+      if (state.unlockedGems[st]) {
+        gemEl.classList.add('unlocked');
+        if (tagEl) tagEl.style.display = 'block';
+        if (cardEl) cardEl.classList.add('completed');
+      }
+    });
+
+    // Check if all unlocked
+    const allDone = Object.values(state.unlockedGems).every(v => v === true);
+    const finalBtn = document.getElementById('btn-final-cert');
+    if (finalBtn) {
+      finalBtn.style.display = allDone ? 'block' : 'none';
+    }
+  }
+
+  // Audio synthesizer (Web Audio API)
+  function playSound(type) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+        osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3); // C6
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.6);
+      } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, ctx.currentTime);
+        osc.frequency.setValueAtTime(180, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch(e) {}
+  }
+
+  // Text-To-Speech (Web Speech API)
+  function speakText(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-TW';
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('您的設備暫不支援語音朗讀功能');
+    }
+  }
+
+  // Navigation
+  function navigateTo(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(`screen-${screenId}`);
+    if (target) {
+      target.classList.add('active');
+      window.location.hash = screenId;
+    }
+    if (screenId === 'certificate') {
+      const now = new Date();
+      document.getElementById('cert-date-str').innerText = `核發日期：${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日`;
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+  }
+
+  // Hash router
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) navigateTo(hash);
+  });
+
+  // STATION 1 LOGIC
+  function toggleSt1Chip(el, word) {
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      state.st1SelectedWords = state.st1SelectedWords.filter(w => w !== word);
+    } else {
+      el.classList.add('selected');
+      state.st1SelectedWords.push(word);
+    }
+    const box = document.getElementById('st1-answer-box');
+    box.innerText = state.st1SelectedWords.length > 0 ? state.st1SelectedWords.join('') : '(點選下方字詞填入)';
+  }
+
+  function verifyStation1() {
+    const ans = state.st1SelectedWords.join('');
+    if (ans === '知識就是力量') {
+      playSound('success');
+      confetti({ particleCount: 50, spread: 60 });
+      alert('🎉 太棒了！解開圖書密碼鎖，獲得【知】字智慧寶石！');
+      state.unlockedGems.st1 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert('❌ 密碼不太對喔！請參考索書號與書中文字重新試試看！（提示：知識就是...）');
+    }
+  }
+
+  // STATION 2 LOGIC
+  function selectQuiz(qId, val, el) {
+    state.st2Answers[qId] = val;
+    const parent = document.getElementById(`${qId}-options`);
+    parent.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function verifyStation2() {
+    if (state.st2Answers.q1 === 5 && state.st2Answers.q2 === 110) {
+      playSound('success');
+      confetti({ particleCount: 50, spread: 60 });
+      alert('🎉 恭喜通過波麗士眼力大考驗，獲得【正】字正義寶石！');
+      state.unlockedGems.st2 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert('❌ 有答案選錯了喔！警徽有 5 顆星，報案要打 110，再檢查看看吧！');
+    }
+  }
+
+  // STATION 3 BINGO LOGIC
+  function initBingoBoard() {
+    const board = document.getElementById('bingo-board');
+    board.innerHTML = '';
+    bingoItems.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'bingo-card';
+      card.innerHTML = `<div class="bingo-icon">${item.icon}</div><div class="bingo-label">${item.name}</div>`;
+      card.onclick = () => {
+        state.st3BingoState[idx] = !state.st3BingoState[idx];
+        card.classList.toggle('checked', state.st3BingoState[idx]);
+        playSound('success');
+      };
+      board.appendChild(card);
+    });
+  }
+
+  function checkBingoLines() {
+    const g = state.st3BingoState;
+    const lines = [
+      [0,1,2], [3,4,5], [6,7,8], // Rows
+      [0,3,6], [1,4,7], [2,5,8], // Cols
+      [0,4,8], [2,4,6]          // Diagonals
     ];
+    let count = 0;
+    lines.forEach(l => {
+      if (g[l[0]] && g[l[1]] && g[l[2]]) count++;
+    });
+    return count;
+  }
 
-    function sendQuickQuery(query) {
-        document.getElementById('userInput').value = query;
-        handleUserInput(new Event('submit'));
+  function verifyStation3() {
+    const lines = checkBingoLines();
+    if (lines >= 2) {
+      playSound('success');
+      confetti({ particleCount: 70, spread: 70 });
+      alert(`🎉 太厲害了！你完成了 ${lines} 條連線 BINGO！獲得【愛】字生態寶石！`);
+      state.unlockedGems.st3 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert(`目前完成了 ${lines} 條連線，還差一點點！需要達成 2 條連線才能通關喔！`);
     }
+  }
 
-    function handleUserInput(e) {
-        if(e) e.preventDefault();
-        const inputEl = document.getElementById('userInput');
-        const userMsg = inputEl.value.trim();
-        if (!userMsg) return;
+  // STATION 4 LOGIC
+  function addCoin(val) {
+    state.st4CurrentCoins += val;
+    document.getElementById('current-change-val').innerText = state.st4CurrentCoins;
+    playSound('success');
+  }
 
-        appendUserMessage(userMsg);
-        inputEl.value = '';
-        showTypingIndicator();
+  function resetCoins() {
+    state.st4CurrentCoins = 0;
+    document.getElementById('current-change-val').innerText = '0';
+  }
 
-        setTimeout(() => {
-            removeTypingIndicator();
-            const matchedData = findAnswers(userMsg);
-            appendBotMessage(matchedData, userMsg);
-        }, 550);
+  function verifyStation4() {
+    if (state.st4CurrentCoins === 5) {
+      playSound('success');
+      confetti({ particleCount: 50, spread: 60 });
+      alert('🎉 太厲害了！算數完全正確，成功拿回 5 元找零，獲得【合】字合作寶石！');
+      state.unlockedGems.st4 = true;
+      saveState();
+      navigateTo('map');
+    } else {
+      playSound('error');
+      alert(`❌ 找零金額不太對喔！(花了 15 + 10 = 25元，拿 30 元給老闆，應該找回 5 元)。目前點算：${state.st4CurrentCoins} 元。`);
     }
+  }
 
-    function findAnswers(query) {
-        const lowerQuery = query.toLowerCase();
-        let matches = [];
+  // CERTIFICATE DOWNLOAD
+  function downloadCertificate() {
+    const area = document.getElementById('cert-print-area');
+    html2canvas(area).then(canvas => {
+      const link = document.createElement('a');
+      link.download = '秀朗社區小偵探_榮譽證書.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  }
 
-        knowledgeBase.forEach(item => {
-            let score = 0;
-            item.keywords.forEach(kw => {
-                if (lowerQuery.includes(kw.toLowerCase())) {
-                    score += 2;
-                }
-            });
-            if (score > 0) {
-                matches.push({ item, score });
-            }
-        });
-
-        matches.sort((a, b) => b.score - a.score);
-
-        if (matches.length > 0) {
-            return matches.map(m => m.item);
-        } else {
-            return null;
-        }
+  // Initialize
+  window.onload = () => {
+    initBingoBoard();
+    loadSavedState();
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      navigateTo(hash);
     }
-
-    function appendUserMessage(text) {
-        const chatBody = document.getElementById('chatBody');
-        const msgRow = document.createElement('div');
-        msgRow.className = 'message-row user';
-        msgRow.innerHTML = `
-            <div class="msg-avatar"><i class="fa-solid fa-user"></i></div>
-            <div class="msg-content">
-                <div class="msg-bubble">${escapeHtml(text)}</div>
-                <div class="msg-time">${getCurrentTime()}</div>
-            </div>
-        `;
-        chatBody.appendChild(msgRow);
-        scrollToBottom();
-    }
-
-    function appendBotMessage(results, queryText) {
-        const chatBody = document.getElementById('chatBody');
-        const msgRow = document.createElement('div');
-        msgRow.className = 'message-row bot';
-
-        let contentHTML = '';
-
-        if (results && results.length > 0) {
-            contentHTML += `關於「<strong>${escapeHtml(queryText)}</strong>」找到以下官網連結：`;
-            
-            results.forEach(res => {
-                contentHTML += `
-                    <div class="bot-card">
-                        <div class="bot-card-title">${res.title}</div>
-                        <p style="font-size: 0.82rem; color: #4a5568;">${res.summary}</p>
-                        <div class="link-group">
-                `;
-                res.links.forEach(l => {
-                    contentHTML += `
-                        <a href="${l.url}" target="_blank" class="link-btn">
-                            <span><i class="fa-solid fa-link" style="margin-right:5px;"></i> ${l.text}</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                    `;
-                });
-                contentHTML += `</div></div>`;
-            });
-        } else {
-            contentHTML = `
-                抱歉，沒有找到與「<strong>${escapeHtml(queryText)}</strong>」對應的項目 😅<br>
-                建議您：<br>
-                1. 點擊頂部快捷鍵（如午餐退費、行事曆、分機）。<br>
-                2. 前往 <a href="https://www.hles.ntpc.edu.tw/" target="_blank" style="color:var(--primary-color);font-weight:bold;">秀朗國小官網</a>。<br>
-                3. 致電學校總機：<strong>(02) 2942-0451</strong>。
-            `;
-        }
-
-        msgRow.innerHTML = `
-            <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-            <div class="msg-content">
-                <div class="msg-bubble">${contentHTML}</div>
-                <div class="msg-time">${getCurrentTime()}</div>
-            </div>
-        `;
-        chatBody.appendChild(msgRow);
-        scrollToBottom();
-    }
-
-    function showTypingIndicator() {
-        const chatBody = document.getElementById('chatBody');
-        const typingEl = document.createElement('div');
-        typingEl.id = 'typingIndicator';
-        typingEl.className = 'message-row bot';
-        typingEl.innerHTML = `
-            <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-            <div class="typing-indicator">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-            </div>
-        `;
-        chatBody.appendChild(typingEl);
-        scrollToBottom();
-    }
-
-    function removeTypingIndicator() {
-        const el = document.getElementById('typingIndicator');
-        if (el) el.remove();
-    }
-
-    function clearChat() {
-        const chatBody = document.getElementById('chatBody');
-        chatBody.innerHTML = `
-            <div class="message-row bot">
-                <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-                <div class="msg-content">
-                    <div class="msg-bubble">
-                        對話已重置！我是秀朗國小 <strong>秀秀機器人</strong> 🤖🍎<br>
-                        請點選快捷鍵或輸入問題，隨時為您服務！
-                    </div>
-                    <div class="msg-time">${getCurrentTime()}</div>
-                </div>
-            </div>
-        `;
-    }
-
-    function getCurrentTime() {
-        const now = new Date();
-        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    }
-
-    function scrollToBottom() {
-        const chatBody = document.getElementById('chatBody');
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    function escapeHtml(str) {
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
+  };
 </script>
 </body>
 </html>
