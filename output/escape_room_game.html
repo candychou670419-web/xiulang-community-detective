@@ -625,20 +625,20 @@
     <h2>📖 第一站：民權圖書館（閱讀好書拍照）</h2>
 
     <div class="story-card" id="st1-prompt">
-      <b>閱讀任務：</b><br>
-      請在圖書館挑選一本你最喜歡的好書，坐下來安靜閱讀。讀完後，用平板相機將<b>【書籍封面】</b>拍照上傳！
+      <b>第一站閱讀任務：</b><br>
+      請在圖書館挑選一本你最喜歡的好書，坐下來安靜閱讀。請帶隊家長協助將小組同學認真閱讀的模樣上傳，便通過考驗！
     </div>
 
     <div class="input-group">
-      <label style="display:block; font-weight:bold; margin-bottom:6px;">你閱讀的好書書名：</label>
+      <label style="display:block; font-weight:bold; margin-bottom:6px;">你閱讀的好書書名（選填）：</label>
       <input type="text" id="st1-book-title" class="input-field" style="width:100%;" placeholder="例如：神奇樹屋 / 大腳ㄚ跳芭蕾">
     </div>
 
     <div class="photo-upload-box" onclick="document.getElementById('st1-file-input').click()">
       <div style="font-size: 2.5rem; margin-bottom: 6px;">📷</div>
-      <div style="font-weight: bold; color: #2563eb;">點擊這裡拍攝或選擇「好書封面照片」</div>
+      <div style="font-weight: bold; color: #2563eb;">點擊拍攝或上傳「同學認真閱讀的照片」</div>
       <input type="file" id="st1-file-input" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoUpload(this)">
-      <img id="st1-photo-preview" class="photo-preview" alt="好書封面預覽">
+      <img id="st1-photo-preview" class="photo-preview" alt="認真閱讀照片預覽">
     </div>
 
     <div style="margin-top: auto; display: flex; gap: 10px;">
@@ -942,13 +942,13 @@
     if (state.st1HasPhoto || title.length > 0) {
       playSound('success');
       confetti({ particleCount: 50, spread: 60 });
-      alert('🎉 恭喜完成閱讀任務與封面拍照！獲得【Show SMART】榮譽徽章！');
+      alert('🎉 恭喜完成第一站閱讀任務！已成功上傳同學認真閱讀的照片，獲得【Show SMART】榮譽徽章！');
       state.unlockedGems.st1 = true;
       saveState();
       navigateTo('map');
     } else {
       playSound('error');
-      alert('❌ 請先輸入書名或拍攝上傳好書封面照片喔！');
+      alert('❌ 請帶隊家長協助拍攝或上傳小組同學認真閱讀的照片喔！');
     }
   }
 
