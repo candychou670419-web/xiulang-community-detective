@@ -67,11 +67,11 @@
     }
 
     .brand-title {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 800;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .brand-title span.badge {
@@ -86,36 +86,33 @@
     /* Gem inventory */
     .gems-tracker {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       background: rgba(255,255,255,0.2);
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 20px;
     }
 
-    .gem-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
+    .gem-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.3);
+      font-size: 11px;
       font-weight: bold;
-      color: #aaa;
+      color: #cbd5e1;
       transition: all 0.4s ease;
-      border: 2px solid transparent;
+      border: 1.5px solid transparent;
+      white-space: nowrap;
     }
 
-    .gem-icon.unlocked {
+    .gem-badge.unlocked {
       background: #fbbf24;
       color: #78350f;
       border-color: #ffffff;
-      box-shadow: 0 0 10px #fbbf24;
-      transform: scale(1.1);
+      box-shadow: 0 0 8px #fbbf24;
+      transform: scale(1.05);
     }
 
-    /* Speech synthesis audio btn */
+    /* Audio button */
     .audio-btn {
       background: #fef08a;
       color: #854d0e;
@@ -190,7 +187,7 @@
     }
 
     .story-text {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       line-height: 1.7;
       color: #334155;
     }
@@ -234,14 +231,14 @@
     }
 
     .station-title {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: bold;
       color: var(--primary-dark);
       margin-bottom: 4px;
     }
 
     .station-subtitle {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #64748b;
     }
 
@@ -291,85 +288,73 @@
       box-shadow: none;
     }
 
-    /* Puzzle 1: Book Password */
-    .book-callnum {
-      background: #fef3c7;
-      border: 2px solid #f59e0b;
-      padding: 12px;
-      border-radius: 12px;
-      font-family: monospace;
-      font-size: 1.5rem;
-      font-weight: bold;
+    /* Photo Upload Component */
+    .photo-upload-box {
+      background: #f8fafc;
+      border: 3px dashed #93c5fd;
+      border-radius: 16px;
+      padding: 20px;
       text-align: center;
-      letter-spacing: 2px;
-      color: #b45309;
-      margin: 12px 0;
+      margin: 16px 0;
+      cursor: pointer;
+      position: relative;
     }
 
-    .word-chips-container {
+    .photo-preview {
+      max-width: 100%;
+      max-height: 220px;
+      border-radius: 12px;
+      margin-top: 12px;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Police Matching Component */
+    .matching-container {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
       margin: 16px 0;
     }
 
-    .word-chip {
-      background: #f1f5f9;
+    .matching-item {
+      background: #ffffff;
       border: 2px solid #cbd5e1;
-      padding: 10px 18px;
-      border-radius: 12px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .word-chip.selected {
-      background: #3b82f6;
-      color: white;
-      border-color: #1d4ed8;
-      transform: scale(1.05);
-    }
-
-    .answer-box {
-      min-height: 50px;
-      background: #fafafa;
-      border: 2px dashed #94a3b8;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #2563eb;
-      margin-bottom: 16px;
-      padding: 8px;
-    }
-
-    /* Puzzle 2: Police Eyes */
-    .quiz-option {
-      background: #f8fafc;
-      border: 2px solid #e2e8f0;
-      padding: 14px 18px;
       border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .matching-title {
       font-size: 1.05rem;
       font-weight: bold;
-      margin-bottom: 12px;
-      cursor: pointer;
+      color: #1e293b;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+    }
+
+    .matching-options {
+      display: flex;
+      gap: 10px;
+    }
+
+    .match-opt-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
       transition: all 0.2s;
     }
 
-    .quiz-option:hover {
-      border-color: #93c5fd;
-      background: #eff6ff;
-    }
-
-    .quiz-option.active {
+    .match-opt-btn.selected {
       border-color: #3b82f6;
       background: #dbeafe;
       color: #1e40af;
@@ -500,7 +485,7 @@
     }
 
     .cert-header {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       color: #92400e;
       font-weight: bold;
       margin-bottom: 12px;
@@ -516,7 +501,7 @@
       align-items: center;
       justify-content: center;
       margin: 16px auto;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: bold;
       border: 4px solid #fef2f2;
       box-shadow: 0 4px 12px rgba(220,38,38,0.4);
@@ -531,7 +516,7 @@
     .input-field {
       width: 80%;
       padding: 12px;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       border: 2px solid #cbd5e1;
       border-radius: 12px;
       text-align: center;
@@ -547,12 +532,12 @@
     <div class="brand-title">
       🕵️‍♂️ 社區小偵探 <span class="badge">二年級版</span>
     </div>
-    <!-- Gem Inventory -->
+    <!-- Gem inventory badges -->
     <div class="gems-tracker">
-      <div class="gem-icon" id="gem-1" title="民權圖書館：知">知</div>
-      <div class="gem-icon" id="gem-2" title="得和派出所：正">正</div>
-      <div class="gem-icon" id="gem-3" title="瓦窯溝：愛">愛</div>
-      <div class="gem-icon" id="gem-4" title="民治市場：合">合</div>
+      <div class="gem-badge" id="gem-1" title="Show SMART">Show SMART</div>
+      <div class="gem-badge" id="gem-2" title="Show Better">Show Better</div>
+      <div class="gem-badge" id="gem-3" title="立足本土">立足本土</div>
+      <div class="gem-badge" id="gem-4" title="展望國際">展望國際</div>
     </div>
   </header>
 
@@ -571,8 +556,8 @@
       </button>
       <div class="story-text" id="story-content">
         親愛的小偵探：<br>
-        我是社區守護者小貓頭鷹！秀朗社區的「神奇守護寶石」被藏在四個重要的秘密地點。<br>
-        請你們帶著平板，前往<b>【民權圖書館】</b>、<b>【得和派出所】</b>、<b>【瓦窯溝】</b>與<b>【民治市場】</b>，解開四道謎題，收集<b>【知、正、愛、合】</b>四顆寶石，召喚守護者吧！
+        我是社區守護者小貓頭鷹！秀朗社區的「四項榮譽徽章」被藏在四個重要的秘密地點。<br>
+        請你們帶著平板，前往<b>【民權圖書館】</b>、<b>【得和派出所】</b>、<b>【瓦窯溝】</b>與<b>【民治市場】</b>解開四道任務，收集<b>【Show SMART】</b>、<b>【Show Better】</b>、<b>【立足本土】</b>、<b>【展望國際】</b>四座榮譽徽章，喚醒守護者吧！
       </div>
     </div>
 
@@ -594,9 +579,9 @@
     <div class="map-grid">
       <!-- Station 1 -->
       <div class="station-card" id="card-st1" onclick="navigateTo('station1')">
-        <div class="station-badge-icon">📚</div>
+        <div class="station-badge-icon">📖</div>
         <div class="station-title">第一站：民權圖書館</div>
-        <div class="station-subtitle">【文字解密】圖書密碼鎖</div>
+        <div class="station-subtitle">閱讀好書，拍照上傳</div>
         <div class="completed-tag" id="tag-st1" style="display:none;">已通關 ✓</div>
       </div>
 
@@ -604,7 +589,7 @@
       <div class="station-card" id="card-st2" onclick="navigateTo('station2')">
         <div class="station-badge-icon">👮‍♂️</div>
         <div class="station-title">第二站：得和派出所</div>
-        <div class="station-subtitle">【觀察辨識】眼力大考驗</div>
+        <div class="station-subtitle">交通警察及刑警裝備配對</div>
         <div class="completed-tag" id="tag-st2" style="display:none;">已通關 ✓</div>
       </div>
 
@@ -612,94 +597,109 @@
       <div class="station-card" id="card-st3" onclick="navigateTo('station3')">
         <div class="station-badge-icon">🌿</div>
         <div class="station-title">第三站：瓦窯溝</div>
-        <div class="station-subtitle">【生態探索】河畔 Bingo</div>
-        <div class="completed-tag" id="tag-st3" style="display:none;">已通關 ✓</div>
+        <div class="station-subtitle">河畔生態 Bingo 卡</div>
+        <div class="completed-tag" id="tag-st3" style="display:none;">已通关 ✓</div>
       </div>
 
       <!-- Station 4 -->
       <div class="station-card" id="card-st4" onclick="navigateTo('station4')">
         <div class="station-badge-icon">🍎</div>
         <div class="station-title">第四站：民治市場</div>
-        <div class="station-subtitle">【金錢運用】30元探險家</div>
+        <div class="station-subtitle">30元美食探險家</div>
         <div class="completed-tag" id="tag-st4" style="display:none;">已通關 ✓</div>
       </div>
     </div>
 
     <div style="margin-top: 24px;">
       <button class="btn btn-success" id="btn-final-cert" onclick="navigateTo('certificate')" style="display: none;">
-        🏆 集齊 4 顆寶石！領取榮譽證書
+        🏆 集齊 4 座徽章！領取榮譽證書
       </button>
     </div>
   </div>
 
-  <!-- SCREEN STATION 1: MINQUAN LIBRARY -->
+  <!-- SCREEN STATION 1: MINQUAN LIBRARY (READ & PHOTO UPLOAD) -->
   <div id="screen-station1" class="screen">
     <button class="audio-btn" onclick="speakText(document.getElementById('st1-prompt').innerText)">
       🔊 聽關卡任務說明
     </button>
-    <h2>📚 第一站：民權圖書館（圖書密碼鎖）</h2>
+    <h2>📖 第一站：民權圖書館（閱讀好書拍照）</h2>
 
     <div class="story-card" id="st1-prompt">
-      <b>任務提示：</b><br>
-      請在圖書館中尋找「神祕索書號」卡片所標示的書籍！打開書本指定頁碼，找到知識密碼。
+      <b>閱讀任務：</b><br>
+      請在圖書館挑選一本你最喜歡的好書，坐下來安靜閱讀。讀完後，用平板相機將<b>【書籍封面】</b>拍照上傳！
     </div>
 
-    <div class="book-callnum">
-      索書號：J 520 1234
+    <div class="input-group">
+      <label style="display:block; font-weight:bold; margin-bottom:6px;">你閱讀的好書書名：</label>
+      <input type="text" id="st1-book-title" class="input-field" style="width:100%;" placeholder="例如：神奇樹屋 / 大腳ㄚ跳芭蕾">
     </div>
 
-    <p style="font-weight: bold; margin-bottom: 8px;">請點擊下列字詞，組合出書中的關鍵密碼：</p>
-    
-    <div class="answer-box" id="st1-answer-box">
-      <span style="color:#cbd5e1;">(點選下方字詞填入)</span>
-    </div>
-
-    <div class="word-chips-container" id="st1-chips">
-      <div class="word-chip" onclick="toggleSt1Chip(this, '知')">知</div>
-      <div class="word-chip" onclick="toggleSt1Chip(this, '識')">識</div>
-      <div class="word-chip" onclick="toggleSt1Chip(this, '就')">就</div>
-      <div class="word-chip" onclick="toggleSt1Chip(this, '是')">是</div>
-      <div class="word-chip" onclick="toggleSt1Chip(this, '力')">力</div>
-      <div class="word-chip" onclick="toggleSt1Chip(this, '量')">量</div>
-      <div class="word-chip" onclick="toggleSt1Chip(this, '快')">快</div>
-      <div class="word-chip" onclick="toggleSt1Chip(this, '樂')">樂</div>
+    <div class="photo-upload-box" onclick="document.getElementById('st1-file-input').click()">
+      <div style="font-size: 2.5rem; margin-bottom: 6px;">📷</div>
+      <div style="font-weight: bold; color: #2563eb;">點擊這裡拍攝或選擇「好書封面照片」</div>
+      <input type="file" id="st1-file-input" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoUpload(this)">
+      <img id="st1-photo-preview" class="photo-preview" alt="好書封面預覽">
     </div>
 
     <div style="margin-top: auto; display: flex; gap: 10px;">
       <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
-      <button class="btn" onclick="verifyStation1()">提交驗證</button>
+      <button class="btn" onclick="verifyStation1()">提交並驗證【Show SMART】</button>
     </div>
   </div>
 
-  <!-- SCREEN STATION 2: POLICE STATION -->
+  <!-- SCREEN STATION 2: POLICE STATION (MATCHING POLICE EQUIPMENT) -->
   <div id="screen-station2" class="screen">
     <button class="audio-btn" onclick="speakText(document.getElementById('st2-prompt').innerText)">
       🔊 聽關卡任務說明
     </button>
-    <h2>👮‍♂️ 第二站：得和派出所（波麗士眼力大考驗）</h2>
+    <h2>👮‍♂️ 第二站：得和派出所（交通警察及刑警裝備配對）</h2>
 
     <div class="story-card" id="st2-prompt">
-      <b>觀察任務：</b><br>
-      觀察得和派出所門口警徽與告示牌，回答下列波麗士小問題！
+      <b>波麗士裝備配對任務：</b><br>
+      警察伯伯有不同分工！請把下列裝備點選分類為<b>【交通警察】</b>或<b>【刑警 / 偵查隊】</b>！
     </div>
 
-    <p style="font-weight: bold; margin-bottom: 8px;">問題一：警察伯伯警徽上有幾顆金黃色星芒？</p>
-    <div id="q1-options">
-      <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">A. 3 顆星</div>
-      <div class="quiz-option" onclick="selectQuiz('q1', 5, this)">B. 5 顆星</div>
-      <div class="quiz-option" onclick="selectQuiz('q1', 8, this)">C. 8 顆星</div>
-    </div>
+    <div class="matching-container">
+      <!-- Item 1 -->
+      <div class="matching-item">
+        <div class="matching-title">1. 🚦 高亮度反光背心與指揮棒</div>
+        <div class="matching-options">
+          <div class="match-opt-btn" onclick="selectMatch(1, 'traffic', this)">交通警察</div>
+          <div class="match-opt-btn" onclick="selectMatch(1, 'criminal', this)">刑警 / 偵查隊</div>
+        </div>
+      </div>
 
-    <p style="font-weight: bold; margin: 12px 0 8px 0;">問題二：遇緊急狀況想向派出所求助，應該撥打電話號碼？</p>
-    <div id="q2-options">
-      <div class="quiz-option" onclick="selectQuiz('q2', 110, this)">A. 110 (報案專線)</div>
-      <div class="quiz-option" onclick="selectQuiz('q2', 119, this)">B. 119 (火災救護)</div>
-      <div class="quiz-option" onclick="selectQuiz('q2', 113, this)">C. 113 (家暴保護)</div>
+      <!-- Item 2 -->
+      <div class="matching-item">
+        <div class="matching-title">2. 🔍 現場採證箱與指紋刷</div>
+        <div class="matching-options">
+          <div class="match-opt-btn" onclick="selectMatch(2, 'traffic', this)">交通警察</div>
+          <div class="match-opt-btn" onclick="selectMatch(2, 'criminal', this)">刑警 / 偵查隊</div>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="matching-item">
+        <div class="matching-title">3. 📷 移動式測速照相機</div>
+        <div class="matching-options">
+          <div class="match-opt-btn" onclick="selectMatch(3, 'traffic', this)">交通警察</div>
+          <div class="match-opt-btn" onclick="selectMatch(3, 'criminal', this)">刑警 / 偵查隊</div>
+        </div>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="matching-item">
+        <div class="matching-title">4. ⛓️ 偵查手銬與刑警警徽證件</div>
+        <div class="matching-options">
+          <div class="match-opt-btn" onclick="selectMatch(4, 'traffic', this)">交通警察</div>
+          <div class="match-opt-btn" onclick="selectMatch(4, 'criminal', this)">刑警 / 偵查隊</div>
+        </div>
+      </div>
     </div>
 
     <div style="margin-top: auto; display: flex; gap: 10px;">
       <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
-      <button class="btn" onclick="verifyStation2()">提交驗證</button>
+      <button class="btn" onclick="verifyStation2()">驗證配對【Show Better】</button>
     </div>
   </div>
 
@@ -717,7 +717,7 @@
 
     <div style="margin-top: auto; display: flex; gap: 10px;">
       <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
-      <button class="btn" onclick="verifyStation3()">驗證 Bingo 連線</button>
+      <button class="btn" onclick="verifyStation3()">驗證【立足本土】</button>
     </div>
   </div>
 
@@ -752,7 +752,7 @@
 
     <div style="margin-top: auto; display: flex; gap: 10px;">
       <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
-      <button class="btn" onclick="verifyStation4()">提交購物找零結果</button>
+      <button class="btn" onclick="verifyStation4()">驗證【展望國際】</button>
     </div>
   </div>
 
@@ -773,11 +773,11 @@
         <input type="text" id="student-name-input" class="input-field" placeholder="例如：二年一班 第一組" value="秀朗小偵探">
       </div>
 
-      <div style="display: flex; justify-content: center; gap: 12px; margin: 16px 0;">
-        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【知】智慧寶石</span>
-        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【正】正義寶石</span>
-        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【愛】生態寶石</span>
-        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【合】合作寶石</span>
+      <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【Show SMART】</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【Show Better】</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【立足本土】</span>
+        <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【展望國際】</span>
       </div>
 
       <div class="cert-seal">秀朗認證</div>
@@ -800,8 +800,8 @@
   // Game State
   const state = {
     unlockedGems: { st1: false, st2: false, st3: false, st4: false },
-    st1SelectedWords: [],
-    st2Answers: { q1: null, q2: null },
+    st1HasPhoto: false,
+    st2Matches: { 1: null, 2: null, 3: null, 4: null },
     st3BingoState: Array(9).fill(false),
     st4CurrentCoins: 0
   };
@@ -821,7 +821,7 @@
 
   // Load saved state
   function loadSavedState() {
-    const saved = localStorage.getItem('xiulang_escape_game');
+    const saved = localStorage.getItem('xiulang_escape_game_v2');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -832,7 +832,7 @@
   }
 
   function saveState() {
-    localStorage.setItem('xiulang_escape_game', JSON.stringify({ unlockedGems: state.unlockedGems }));
+    localStorage.setItem('xiulang_escape_game_v2', JSON.stringify({ unlockedGems: state.unlockedGems }));
     updateGemUI();
   }
 
@@ -922,53 +922,62 @@
     if (hash) navigateTo(hash);
   });
 
-  // STATION 1 LOGIC
-  function toggleSt1Chip(el, word) {
-    if (el.classList.contains('selected')) {
-      el.classList.remove('selected');
-      state.st1SelectedWords = state.st1SelectedWords.filter(w => w !== word);
-    } else {
-      el.classList.add('selected');
-      state.st1SelectedWords.push(word);
+  // STATION 1 LOGIC (READING PHOTO UPLOAD)
+  function handlePhotoUpload(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('st1-photo-preview');
+        img.src = e.target.result;
+        img.style.display = 'block';
+        state.st1HasPhoto = true;
+        playSound('success');
+      };
+      reader.readAsDataURL(input.files[0]);
     }
-    const box = document.getElementById('st1-answer-box');
-    box.innerText = state.st1SelectedWords.length > 0 ? state.st1SelectedWords.join('') : '(點選下方字詞填入)';
   }
 
   function verifyStation1() {
-    const ans = state.st1SelectedWords.join('');
-    if (ans === '知識就是力量') {
+    const title = document.getElementById('st1-book-title').value.trim();
+    if (state.st1HasPhoto || title.length > 0) {
       playSound('success');
       confetti({ particleCount: 50, spread: 60 });
-      alert('🎉 太棒了！解開圖書密碼鎖，獲得【知】字智慧寶石！');
+      alert('🎉 恭喜完成閱讀任務與封面拍照！獲得【Show SMART】榮譽徽章！');
       state.unlockedGems.st1 = true;
       saveState();
       navigateTo('map');
     } else {
       playSound('error');
-      alert('❌ 密碼不太對喔！請參考索書號與書中文字重新試試看！（提示：知識就是...）');
+      alert('❌ 請先輸入書名或拍攝上傳好書封面照片喔！');
     }
   }
 
-  // STATION 2 LOGIC
-  function selectQuiz(qId, val, el) {
-    state.st2Answers[qId] = val;
-    const parent = document.getElementById(`${qId}-options`);
-    parent.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('active'));
-    el.classList.add('active');
+  // STATION 2 LOGIC (POLICE EQUIPMENT MATCHING)
+  function selectMatch(itemId, role, btnEl) {
+    state.st2Matches[itemId] = role;
+    const parent = btnEl.parentElement;
+    parent.querySelectorAll('.match-opt-btn').forEach(b => b.classList.remove('selected'));
+    btnEl.classList.add('selected');
+    playSound('success');
   }
 
   function verifyStation2() {
-    if (state.st2Answers.q1 === 5 && state.st2Answers.q2 === 110) {
+    // Correct answers:
+    // Item 1 (反光背心): traffic
+    // Item 2 (現場採證箱): criminal
+    // Item 3 (測速照相機): traffic
+    // Item 4 (偵查手銬): criminal
+    const m = state.st2Matches;
+    if (m[1] === 'traffic' && m[2] === 'criminal' && m[3] === 'traffic' && m[4] === 'criminal') {
       playSound('success');
       confetti({ particleCount: 50, spread: 60 });
-      alert('🎉 恭喜通過波麗士眼力大考驗，獲得【正】字正義寶石！');
+      alert('🎉 太厲害了！完全答對交通警察與刑警的裝備分類！獲得【Show Better】榮譽徽章！');
       state.unlockedGems.st2 = true;
       saveState();
       navigateTo('map');
     } else {
       playSound('error');
-      alert('❌ 有答案選錯了喔！警徽有 5 顆星，報案要打 110，再檢查看看吧！');
+      alert('❌ 有項目分類不太對喔！(提醒：反光背心與測速照相機歸交通警察，採證箱與手銬歸刑警)，請再調整看看！');
     }
   }
 
@@ -1008,7 +1017,7 @@
     if (lines >= 2) {
       playSound('success');
       confetti({ particleCount: 70, spread: 70 });
-      alert(`🎉 太厲害了！你完成了 ${lines} 條連線 BINGO！獲得【愛】字生態寶石！`);
+      alert(`🎉 太棒了！達成 ${lines} 條連線 BINGO！獲得【立足本土】榮譽徽章！`);
       state.unlockedGems.st3 = true;
       saveState();
       navigateTo('map');
@@ -1034,7 +1043,7 @@
     if (state.st4CurrentCoins === 5) {
       playSound('success');
       confetti({ particleCount: 50, spread: 60 });
-      alert('🎉 太厲害了！算數完全正確，成功拿回 5 元找零，獲得【合】字合作寶石！');
+      alert('🎉 太厲害了！算數完全正確，拿回 5 元找零！獲得【展望國際】榮譽徽章！');
       state.unlockedGems.st4 = true;
       saveState();
       navigateTo('map');
