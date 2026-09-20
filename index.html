@@ -765,18 +765,23 @@
   <div id="screen-certificate" class="screen">
     <h2>🏆 闖關成功！喚醒秀朗守護者</h2>
 
+    <div class="story-card" style="margin-bottom: 12px; background: #fffbebfb; border-color: #f59e0b;">
+      <label style="display:block; font-weight:bold; margin-bottom:6px; color: #92400e;">請輸入小偵探組別 / 姓名：</label>
+      <input type="text" id="student-name-input" class="input-field" style="width:100%; font-size:1.2rem;" placeholder="例如：二年一班 第一組" value="秀朗小偵探" oninput="updateCertName(this.value)">
+    </div>
+
+    <!-- CERTIFICATE PRINT AREA -->
     <div class="certificate-card" id="cert-print-area">
       <div style="font-size: 3rem; margin-bottom: 4px;">🦉✨</div>
       <div class="cert-header">秀朗社區小偵探 榮譽證書</div>
       
-      <p style="font-size: 1rem; color: #475569; margin-bottom: 12px;">
-        恭喜完成【民權圖書館、得和派出所、瓦窯溝、民治市場】實境解謎任務！
+      <p style="font-size: 1.05rem; color: #475569; margin-bottom: 8px;">
+        頒發給：<b id="cert-name-display" style="color: #1d4ed8; font-size: 1.3rem;">秀朗小偵探</b>
       </p>
 
-      <div class="input-group">
-        <label style="display:block; font-weight:bold; margin-bottom:4px;">小偵探組別 / 姓名：</label>
-        <input type="text" id="student-name-input" class="input-field" placeholder="例如：二年一班 第一組" value="秀朗小偵探">
-      </div>
+      <p style="font-size: 0.95rem; color: #475569; margin-bottom: 12px;">
+        恭喜完成【民權圖書館、得和派出所、瓦窯溝、民治市場】實境解謎任務！
+      </p>
 
       <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
         <span style="background: #fef08a; padding: 6px 12px; border-radius: 12px; font-weight: bold; color: #854d0e;">【Show SMART】</span>
@@ -790,9 +795,20 @@
       <p style="font-size: 0.85rem; color: #94a3b8;" id="cert-date-str"></p>
     </div>
 
+    <!-- GENERATED CERTIFICATE IMAGE PREVIEW -->
+    <div id="cert-result-container" style="display:none; background:#ecfdf5; border:2px dashed #10b981; border-radius:16px; padding:16px; margin-bottom:16px; text-align:center;">
+      <h3 style="color:#047857; margin-bottom:8px;">📸 榮譽證書影像已順利生成！</h3>
+      <p style="font-size:0.9rem; color:#065f46; margin-bottom:12px;">提示：您可以<b>【長按圖片儲存至相簿】</b>，或點選下方按鈕開啟全圖 / 列印！</p>
+      <img id="cert-result-img" style="max-width:100%; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,0.15);" alt="產出的數位證書">
+      <div style="display:flex; gap:8px; margin-top:12px; justify-content:center;">
+        <button class="btn btn-secondary" style="font-size:0.9rem; padding:10px 16px;" onclick="openCertImageNewTab()">↗️ 在新頁面開啟全圖</button>
+        <button class="btn btn-secondary" style="font-size:0.9rem; padding:10px 16px;" onclick="printCertArea()">🖨️ 列印證書</button>
+      </div>
+    </div>
+
     <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
-      <button class="btn btn-success" onclick="downloadCertificate()">
-        📸 儲存 / 下載數位證書
+      <button class="btn btn-success" onclick="generateAndDownloadCert()">
+        📸 產生 / 下載數位證書
       </button>
       <button class="btn btn-secondary" onclick="navigateTo('map')">
         返回社區地圖
@@ -1078,15 +1094,54 @@
     }
   }
 
-  // CERTIFICATE DOWNLOAD
-  function downloadCertificate() {
+  // CERTIFICATE GENERATION & FAIL-SAFE PREVIEW/DOWNLOAD
+  function updateCertName(val) {
+    document.getElementById('cert-name-display').innerText = val.trim() || '秀朗小偵探';
+  }
+
+  function generateAndDownloadCert() {
     const area = document.getElementById('cert-print-area');
-    html2canvas(area).then(canvas => {
+    html2canvas(area, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Update preview image element
+      const resultImg = document.getElementById('cert-result-img');
+      resultImg.src = imgData;
+      document.getElementById('cert-result-container').style.display = 'block';
+
+      // Scroll preview into view
+      document.getElementById('cert-result-container').scrollIntoView({ behavior: 'smooth' });
+
+      // Trigger automatic browser download
       const link = document.createElement('a');
-      link.download = '秀朗社區小偵探_榮譽證書.png';
-      link.href = canvas.toDataURL();
+      link.download = `秀朗社區小偵探_榮譽證書_${Date.now()}.png`;
+      link.href = imgData;
       link.click();
+    }).catch(err => {
+      alert('證書繪製中，請使用【🖨️ 列印證書】按鈕或螢幕截圖存檔喔！');
     });
+  }
+
+  function openCertImageNewTab() {
+    const img = document.getElementById('cert-result-img');
+    if (img && img.src) {
+      const win = window.open();
+      if (win) {
+        win.document.write(`<title>秀朗社區小偵探_榮譽證書</title><body style="margin:0; background:#333; display:flex; justify-content:center; align-items:center; min-height:100vh;"><img src="${img.src}" style="max-width:100%; height:auto;"></body>`);
+      } else {
+        alert('請允許開啟彈出視窗以檢視證書大圖！');
+      }
+    } else {
+      alert('請先點選「產生 / 下載數位證書」喔！');
+    }
+  }
+
+  function printCertArea() {
+    window.print();
   }
 
   // Initialize
