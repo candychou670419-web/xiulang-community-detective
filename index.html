@@ -640,6 +640,11 @@
       <input type="file" id="st1-file-input" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoUpload(this)">
       <img id="st1-photo-preview" class="photo-preview" alt="認真閱讀照片預覽">
     </div>
+    <div id="st1-download-btn-container" style="display:none; text-align:center; margin-bottom:12px;">
+      <button class="audio-btn" style="background:#dbeafe; color:#1e40af;" onclick="downloadUploadedPhoto()">
+        💾 下載 / 儲存照片至裝置 (output)
+      </button>
+    </div>
 
     <div style="margin-top: auto; display: flex; gap: 10px;">
       <button class="btn btn-secondary" onclick="navigateTo('map')">返回地圖</button>
@@ -922,27 +927,47 @@
     if (hash) navigateTo(hash);
   });
 
-  // STATION 1 LOGIC (READING PHOTO UPLOAD)
+  // STATION 1 LOGIC (READING PHOTO UPLOAD & SAVE TO OUTPUT)
   function handlePhotoUpload(input) {
     if (input.files && input.files[0]) {
       const reader = new FileReader();
       reader.onload = function(e) {
+        const imgData = e.target.result;
         const img = document.getElementById('st1-photo-preview');
-        img.src = e.target.result;
+        img.src = imgData;
         img.style.display = 'block';
         state.st1HasPhoto = true;
+        state.st1PhotoData = imgData;
+        document.getElementById('st1-download-btn-container').style.display = 'block';
+        try {
+          localStorage.setItem('xiulang_st1_photo_data', imgData);
+        } catch(err){}
         playSound('success');
       };
       reader.readAsDataURL(input.files[0]);
     }
   }
 
+  function downloadUploadedPhoto() {
+    if (state.st1PhotoData) {
+      const link = document.createElement('a');
+      link.download = `output_認真閱讀照片_${Date.now()}.jpg`;
+      link.href = state.st1PhotoData;
+      link.click();
+    } else {
+      alert('請先拍攝或選擇照片喔！');
+    }
+  }
+
   function verifyStation1() {
     const title = document.getElementById('st1-book-title').value.trim();
     if (state.st1HasPhoto || title.length > 0) {
+      if (state.st1PhotoData) {
+        downloadUploadedPhoto();
+      }
       playSound('success');
       confetti({ particleCount: 50, spread: 60 });
-      alert('🎉 恭喜完成第一站閱讀任務！已成功上傳同學認真閱讀的照片，獲得【Show SMART】榮譽徽章！');
+      alert('🎉 恭喜完成第一站閱讀任務！照片已儲存下載至裝置 (output 資料夾)，獲得【Show SMART】榮譽徽章！');
       state.unlockedGems.st1 = true;
       saveState();
       navigateTo('map');
