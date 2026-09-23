@@ -676,6 +676,47 @@ body.theme-space {
     50% { transform: scale(1.04); }
 }
 
+/* 音效狀態按鈕樣式 */
+.btn-audio-status {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 2px solid #A7F3D0;
+    font-size: 0.95rem;
+    padding: 8px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-audio-status.needs-unlock {
+    background: #FEF2F2;
+    color: #991B1B;
+    border-color: #FECACA;
+    animation: pulse 1.8s infinite ease-in-out;
+}
+
+/* 彈窗音效未解鎖提示橫幅 */
+.audio-prompt-banner {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.btn-play-audio {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: #FFFFFF;
+    font-size: 1.3rem;
+    padding: 16px 32px;
+    border-radius: 20px;
+    border: 3px solid #FDE68A;
+    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.35);
+    cursor: pointer;
+    font-weight: 900;
+}
+
 /* 響應式投影機/小螢幕調試 */
 @media (max-width: 768px) {
     .digital-clock {

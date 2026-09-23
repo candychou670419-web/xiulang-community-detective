@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmModal = document.getElementById('alarmModal');
     const settingsModal = document.getElementById('settingsModal');
 
+    const audioStatusBtn = document.getElementById('audioStatusBtn');
+    const audioStatusIcon = document.getElementById('audioStatusIcon');
+    const audioStatusText = document.getElementById('audioStatusText');
+    const audioUnlockPrompt = document.getElementById('audioUnlockPrompt');
+    const manualPlayMusicBtn = document.getElementById('manualPlayMusicBtn');
+
     const testAlarmBtn = document.getElementById('testAlarmBtn');
     const settingsBtn = document.getElementById('settingsBtn');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
@@ -54,6 +60,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 星期幾文字陣列
     const daysCN = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+
+    // --- 音效解鎖與狀態監聽系統 (解決現代瀏覽器 Autoplay 阻擋問題) ---
+    function updateAudioStatus() {
+        if (!audioStatusBtn || !audioStatusIcon || !audioStatusText) return;
+        if (!audioCtx || audioCtx.state === 'suspended') {
+            audioStatusBtn.classList.add('needs-unlock');
+            audioStatusIcon.textContent = '🔇';
+            audioStatusText.textContent = '點此開啟音效';
+        } else {
+            audioStatusBtn.classList.remove('needs-unlock');
+            audioStatusIcon.textContent = '🔊';
+            audioStatusText.textContent = '音效已就緒';
+        }
+    }
+
+    async function unlockAudioContext(silent = true) {
+        try {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+            // 播放 0.001 秒無聲音訊管線確保喚醒硬體輸出
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+
+            updateAudioStatus();
+
+            if (!silent && audioCtx.state === 'running') {
+                playTone(523.25, audioCtx.currentTime + 0.02, 0.12);
+                playTone(659.25, audioCtx.currentTime + 0.15, 0.20);
+            }
+        } catch (err) {
+            console.warn("unlockAudioContext error:", err);
+        }
+    }
+
+    // 全局點擊/觸控/按鍵立即預先解鎖音效權限
+    ['click', 'touchstart', 'pointerdown', 'keydown'].forEach(evt => {
+        window.addEventListener(evt, () => {
+            if (!audioCtx || audioCtx.state === 'suspended') {
+                unlockAudioContext(true);
+            }
+        }, { passive: true });
+    });
+
+    updateAudioStatus();
 
     // --- 1. 時鐘與倒數計時核心邏輯 ---
     function updateClock() {
@@ -86,15 +144,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // 計算距離提醒目標時間 (預設 12:25) 倒數
         calculateCountdown(now);
 
-        // 比對時間觸發提醒 (以 24小時制 HH:mm:00 比對)
+        // 比對時間觸發提醒 (以 24小時制 HH:mm 比對，避免因分頁節流跳過 00 秒)
         const currentHM = `${String(hours).padStart(2, '0')}:${minutes}`;
-        if (currentHM === alarmTime && seconds === '00' && !alarmTriggeredToday) {
+        if (currentHM === alarmTime && !alarmTriggeredToday) {
             triggerAlarmCelebration();
             alarmTriggeredToday = true;
         }
 
-        // 每日過午夜清空觸發狀態
-        if (currentHM === '00:00') {
+        // 當時間離開目標分鐘時，重置觸發狀態，確保明天同一時間能再次準時響鈴
+        if (currentHM !== alarmTime && alarmTriggeredToday) {
             alarmTriggeredToday = false;
         }
     }
@@ -120,20 +178,18 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock();
 
     // --- 2. Web Audio 多聲部歡樂音樂合成器 ---
-    function initAudioContext() {
-        if (!audioCtx) {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContextClass();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-    }
-
-    // 播放歡樂輕快的小短曲 (Happy Celebration Melody)
-    function playCelebrationSong() {
-        initAudioContext();
+    async function playCelebrationSong() {
         if (isPlayingMusic) stopCelebrationSong();
+
+        await unlockAudioContext(true);
+
+        if (!audioCtx || audioCtx.state !== 'running') {
+            // 若瀏覽器政策阻止了定時背景自動發聲，顯示醒目的大按鈕讓老師一鍵播放
+            if (audioUnlockPrompt) audioUnlockPrompt.style.display = 'flex';
+            return;
+        } else {
+            if (audioUnlockPrompt) audioUnlockPrompt.style.display = 'none';
+        }
 
         isPlayingMusic = true;
 
@@ -164,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { note: 523.25, duration: 0.75 }  // C5
         ];
 
-        let currentTime = audioCtx.currentTime + 0.1;
+        let currentTime = audioCtx.currentTime + 0.08;
         const totalDuration = notes.reduce((sum, item) => sum + item.duration, 0);
 
         notes.forEach(item => {
@@ -178,29 +234,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isPlayingMusic) {
                     playCelebrationSong();
                 }
-            }, totalDuration * 1000 + 300);
+            }, totalDuration * 1000 + 350);
         }
     }
 
     function playTone(freq, startTime, duration) {
-        if (!audioCtx || musicVolume === 0) return;
+        if (!audioCtx || audioCtx.state !== 'running' || musicVolume <= 0) return;
 
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
+        try {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
 
-        osc.type = 'triangle'; // 柔和童趣聲音
-        osc.frequency.setValueAtTime(freq, startTime);
+            osc.type = 'triangle'; // 柔和童趣聲音
+            osc.frequency.setValueAtTime(freq, startTime);
 
-        // 主音量與漸弱效果
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(musicVolume * 0.4, startTime + 0.04);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+            const safeStart = Math.max(startTime, audioCtx.currentTime + 0.005);
+            const safeEnd = safeStart + duration;
 
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+            // 使用平滑線性 Ramp 防止指數 Ramp 從 0 開始拋出 DOMException 錯誤
+            gainNode.gain.setValueAtTime(0.0001, safeStart);
+            gainNode.gain.linearRampToValueAtTime(musicVolume * 0.45, safeStart + 0.04);
+            gainNode.gain.linearRampToValueAtTime(0.0001, safeEnd);
 
-        osc.start(startTime);
-        osc.stop(startTime + duration);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            osc.start(safeStart);
+            osc.stop(safeEnd + 0.02);
+        } catch (e) {
+            console.warn("playTone error:", e);
+        }
     }
 
     function stopCelebrationSong() {
@@ -362,10 +425,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 4. 提醒與彈窗觸發控制 ---
-    function triggerAlarmCelebration() {
+    async function triggerAlarmCelebration() {
         alarmModal.classList.add('active');
         startFireworksAnimation();
-        playCelebrationSong();
+        await playCelebrationSong();
 
         // 重置核取方塊
         document.querySelectorAll('.checklist-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
@@ -378,6 +441,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 5. 事件監聽與互動控制 ---
+    // 音效狀態檢測按鈕 (點擊播放雙音測試並解鎖)
+    if (audioStatusBtn) {
+        audioStatusBtn.addEventListener('click', () => {
+            unlockAudioContext(false);
+        });
+    }
+
+    // 彈窗手動解鎖播放音樂大按鈕
+    if (manualPlayMusicBtn) {
+        manualPlayMusicBtn.addEventListener('click', async () => {
+            await unlockAudioContext(true);
+            playCelebrationSong();
+        });
+    }
+
+    // 當彈窗出現時，若音樂受阻，點擊彈窗任一處或核取項目自動補播音樂
+    alarmModal.addEventListener('click', (e) => {
+        if (!isPlayingMusic && !e.target.closest('#stopMusicBtn') && !e.target.closest('#completeAlarmBtn')) {
+            unlockAudioContext(true).then(() => {
+                if (!isPlayingMusic && alarmModal.classList.contains('active')) {
+                    playCelebrationSong();
+                }
+            });
+        }
+    });
+
     // 測試提醒按鈕
     testAlarmBtn.addEventListener('click', () => {
         triggerAlarmCelebration();

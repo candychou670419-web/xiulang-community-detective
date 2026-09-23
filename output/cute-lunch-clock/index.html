@@ -29,6 +29,11 @@
                     <button class="theme-btn" data-theme="theme-space" title="太空冒險">🚀 太空</button>
                 </div>
                 
+                <button id="audioStatusBtn" class="btn btn-audio-status" title="點擊啟用或檢測音效">
+                    <span id="audioStatusIcon">🔊</span>
+                    <span id="audioStatusText">音效就緒</span>
+                </button>
+
                 <button id="testAlarmBtn" class="btn btn-secondary pulse-btn">
                     <span>🧪 測試 12:25 響鈴與煙火</span>
                 </button>
@@ -162,6 +167,13 @@
                         <span>收拾個人物品整理書包</span>
                     </div>
                 </label>
+            </div>
+
+            <!-- 當瀏覽器限制定時自動播放聲音時顯示醒目大按鈕 -->
+            <div id="audioUnlockPrompt" class="audio-prompt-banner" style="display: none;">
+                <button id="manualPlayMusicBtn" class="btn btn-play-audio pulse-btn">
+                    🎵 點擊播放歡樂音樂 🔊
+                </button>
             </div>
 
             <div class="modal-actions">
